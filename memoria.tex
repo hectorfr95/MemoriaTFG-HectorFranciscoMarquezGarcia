@@ -206,7 +206,11 @@ As it is the translation of the ``Resumen'', which is supposed to be written at 
 \label{sec:intro} % etiqueta para poder referenciar luego en el texto con ~\ref{sec:intro}
 \pagenumbering{arabic} % para empezar la numeración de página con números
 
-En las últimas décadas, el desarrollo de software colaborativo ha tenido un crecimiento significativo gracias al auge de los repositorios de código abierto y de plataformas de control de versiones distribuidas como Git. El software colaborativo es muy importante y utilizado en muchas industrias; todas estas compañías que desarrollan software necesitan tener un control sobre sus desarrollos colaborativos. Muchas de ellas utilizan Git como plataforma, sobre la cual tratará el estudio. 
+En las últimas décadas, el desarrollo de software colaborativo ha experimentado un crecimiento significativo gracias al auge de los repositorios de código abierto y de plataformas de desarrollo colaborativo como GitHub\footnote{Plataforma GitHub: \url{https://github.com/}} o GitLab\footnote{Plataforma GitLab: \url{https://gitlab.com/}}, basadas en sistemas de control de versiones distribuidos como Git\footnote{Sitio oficial del proyecto Git: \url{https://git-scm.com/}}. 
+
+El software colaborativo es ampliamente utilizado en múltiples industrias, donde resulta fundamental disponer de mecanismos que permitan gestionar de forma eficiente los cambios realizados por distintos desarrolladores. En este contexto, Git se ha consolidado como la tecnología de referencia para el control de versiones, siendo la base sobre la que se sustentan muchas de estas plataformas.
+
+En este trabajo se estudiará la evolución del desarrollo colaborativo a partir del análisis de repositorios gestionados mediante Git.
 
 Estos repositorios almacenan de forma detallada el historial evolutivo de los proyectos, abriendo la puerta a analizar cómo cambian los desarrollos a lo largo del tiempo mediante el estudio de los \emph{commits} realizados por los desarrolladores.
 
@@ -681,6 +685,75 @@ La elección de estos repositorios permite analizar el comportamiento de la herr
 
 Entre los repositorios analizados se incluyen proyectos populares dentro de la comunidad de desarrollo software, lo que garantiza la relevancia de los resultados obtenidos y su aplicabilidad en contextos reales.
 
+\section{Ejecución de la herramienta}
+\label{sec:ejecucion}
+
+La herramienta \emph{RepoAnalyzer} ha sido ejecutada sobre el repositorio \emph{requests}\footnote{\url{https://github.com/psf/requests}}, un proyecto ampliamente utilizado dentro del ecosistema Python. Este repositorio presenta un volumen significativo de actividad, lo que lo convierte en un caso de estudio adecuado para validar el comportamiento de la herramienta.
+
+La ejecución se realiza a partir de la URL del repositorio, tras lo cual el sistema procesa automáticamente el historial de \emph{commits}, calculando las métricas definidas y generando los correspondientes informes.
+
+En la Figura~\ref{fig:resumen_repo} se muestra un resumen general del repositorio analizado, incluyendo métricas globales como el número total de \emph{commits}, el número de autores únicos y el volumen total de cambios. En este caso, se observa que el repositorio cuenta con más de diez mil \emph{commits} y un número elevado de contribuidores, lo que refleja una actividad de desarrollo significativa y distribuida.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{img/resumen_repo.png}
+\caption{Resumen general del repositorio analizado}
+\label{fig:resumen_repo}
+\end{figure}
+
+Asimismo, la Figura~\ref{fig:clasificacion} muestra la distribución de los \emph{commits} según su categoría semántica. Se puede observar que predominan los cambios clasificados como \emph{other} y \emph{merge}, lo que indica una gran cantidad de integraciones de código y mensajes que no encajan claramente en una categoría específica. Por otro lado, las categorías \emph{corrective} y \emph{management} presentan también una presencia relevante, reflejando tareas habituales de mantenimiento y corrección en el desarrollo del proyecto.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{img/clasificacion.png}
+\caption{Distribución de commits por categoría semántica}
+\label{fig:clasificacion}
+\end{figure}
+
+Por otro lado, el análisis de \emph{tangled commits} se presenta en la Figura~\ref{fig:tangled}, donde se observa la proporción de cambios complejos en el repositorio. En este caso, el porcentaje de \emph{tangled commits} es relativamente bajo, lo que sugiere que la mayoría de los cambios se realizan de forma estructurada, afectando a un número reducido de ficheros por \emph{commit}. Esto puede interpretarse como una buena práctica de desarrollo, en la que los cambios se mantienen acotados y fácilmente comprensibles.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{img/tangled.png}
+\caption{Proporción de \emph{tangled commits} en el repositorio analizado}
+\label{fig:tangled}
+\end{figure}
+
+Finalmente, la Figura~\ref{fig:correlaciones} muestra las correlaciones entre distintas métricas de los \emph{commits}. Se observa una alta correlación entre el número de ficheros modificados y las inserciones, lo que indica que los cambios que afectan a más ficheros tienden también a incluir un mayor número de líneas de código añadidas. Por el contrario, la correlación con las eliminaciones es menor, lo que sugiere que los procesos de eliminación de código no siempre siguen el mismo patrón que las inserciones.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{img/correlaciones.png}
+\caption{Correlaciones entre métricas de commits}
+\label{fig:correlaciones}
+\end{figure}
+
+\section{Validación de resultados}
+\label{sec:validacion}
+
+Los resultados obtenidos a partir de la ejecución de la herramienta \emph{RepoAnalyzer} permiten validar tanto el correcto funcionamiento del sistema como la coherencia de las métricas calculadas en un contexto real.
+
+En primer lugar, las métricas globales del repositorio \emph{requests}\footnote{\url{https://github.com/psf/requests}} reflejan un volumen significativo de actividad, con más de diez mil \emph{commits} y un elevado número de autores. Estos valores son consistentes con la naturaleza del proyecto analizado, que corresponde a una librería ampliamente utilizada y mantenida por una comunidad activa.
+
+En cuanto a la clasificación semántica, se observa una predominancia de categorías como \emph{other} y \emph{merge}. Este resultado es esperable en repositorios de gran tamaño, donde los procesos de integración de código son frecuentes y los mensajes de \emph{commit} no siempre siguen una estructura homogénea. Asimismo, la presencia significativa de categorías como \emph{corrective} y \emph{management} refleja la actividad continua de mantenimiento y evolución del proyecto.
+
+El análisis de \emph{tangled commits} muestra que el porcentaje de este tipo de cambios es reducido en comparación con el total de \emph{commits}. Este resultado sugiere que, en general, los cambios realizados en el repositorio siguen buenas prácticas de desarrollo, manteniendo los \emph{commits} acotados y centrados en una única funcionalidad o propósito.
+
+Por otro lado, el análisis temporal (RQ4) evidencia una gran variabilidad en los intervalos entre \emph{commits}, lo cual es característico de proyectos colaborativos con múltiples contribuidores. La coexistencia de intervalos muy cortos y muy largos refleja diferentes patrones de contribución, desde desarrolladores activos de forma continua hasta aportaciones más esporádicas.
+
+En relación con el análisis del tamaño de los \emph{commits} por categoría (RQ6), se observan diferencias entre tipos de cambios, lo que indica que ciertas actividades, como la incorporación de nuevas funcionalidades o las refactorizaciones, tienden a implicar modificaciones más extensas que otras, como los cambios de mantenimiento.
+
+Adicionalmente, el análisis de correlaciones (RQ7) muestra una fuerte relación entre el número de ficheros modificados y las inserciones de código, lo que resulta coherente con el comportamiento esperado en el desarrollo software.
+
+Además de la interpretación de los resultados, se ha llevado a cabo una verificación de las métricas generadas con el objetivo de asegurar su correcta implementación. En primer lugar, se ha comprobado la consistencia interna de los datos, verificando que las agregaciones realizadas son coherentes, como la correspondencia entre el número total de \emph{commits} y la suma de categorías o la correcta proporción de \emph{tangled commits} respecto al total.
+
+Se han contrastado métricas básicas con herramientas propias del sistema de control de versiones Git. En particular, se han validado valores como el número total de \emph{commits}, el número de autores y el número de \emph{merge commits}, obteniendo resultados consistentes. Durante este proceso, se ha tenido en cuenta que Git puede identificar autores en función de la combinación nombre-correo electrónico, mientras que en este trabajo se ha optado por considerar autores únicos a partir del nombre normalizado, lo que puede generar ligeras diferencias en el conteo si no se aplica el mismo criterio.
+
+Finalmente, se han implementado pruebas automatizadas mediante \emph{pytest}, que permiten verificar tanto la correcta extracción de datos como el funcionamiento de las funciones internas del sistema. Estas pruebas incluyen la comparación de métricas con Git, así como la validación de componentes clave como el parseo de fechas y la clasificación semántica de los \emph{commits}.
+
+En conjunto, estos mecanismos permiten afirmar que las métricas generadas por la herramienta reflejan de forma fiable la información contenida en el repositorio analizado.
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % RESULTADOS %
@@ -690,10 +763,41 @@ Entre los repositorios analizados se incluyen proyectos populares dentro de la c
 \chapter{Resultados}
 \label{chap:resultados}
 
-En este capítulo se incluyen los resultados de tu trabajo fin de grado.
+\section{Análisis global del repositorio}
+\label{sec:analisis_global}
 
-Si es una herramienta de análisis lo que has realizado, aquí puedes poner ejemplos de haberla utilizado para que se vea su utilidad.
+El análisis del repositorio seleccionado permite obtener una visión general del comportamiento del desarrollo colaborativo en proyectos de software de código abierto. Los resultados muestran un elevado volumen de actividad, tanto en número de \emph{commits} como en número de contribuidores, lo que indica una evolución continua del proyecto a lo largo del tiempo.
 
+Asimismo, se observa que la actividad no se distribuye de forma homogénea entre los desarrolladores, sino que existe un núcleo reducido de contribuidores con una mayor participación, frente a un conjunto más amplio de colaboradores ocasionales. Este patrón es habitual en proyectos de software libre y refleja una organización basada en contribuciones abiertas.
+
+En términos generales, el repositorio presenta una evolución estable, con una actividad sostenida en el tiempo y una estructura de contribución coherente con proyectos maduros dentro del ecosistema de desarrollo software.
+
+\section{Patrones de desarrollo observados}
+\label{sec:patrones}
+
+El análisis de la clasificación semántica de los \emph{commits} permite identificar patrones relevantes en el comportamiento de desarrollo. En particular, se observa una alta presencia de \emph{merge commits}, lo que indica un uso frecuente de ramas y procesos de integración de cambios.
+
+Además, la predominancia de categorías como \emph{corrective} y \emph{management} refleja la importancia de las tareas de mantenimiento en el ciclo de vida del software. Esto sugiere que una parte significativa del esfuerzo de desarrollo se destina a la corrección de errores y a la gestión del código existente.
+
+Por otro lado, la categoría \emph{forward}, asociada a la incorporación de nuevas funcionalidades, presenta una menor proporción relativa, lo que puede indicar que el proyecto se encuentra en una fase madura, donde predominan las tareas de mantenimiento frente al desarrollo de nuevas características.
+
+\section{Calidad de los commits}
+\label{sec:calidad}
+
+El análisis de \emph{tangled commits} proporciona información relevante sobre la calidad de los cambios realizados en el repositorio. Los resultados muestran que la proporción de \emph{commits} que agrupan múltiples modificaciones en distintos ficheros es relativamente baja, como se ha mostrado previamente en la Figura~\ref{fig:tangled}.
+
+Este comportamiento sugiere que los desarrolladores siguen buenas prácticas, manteniendo los cambios acotados y centrados en una única funcionalidad. Este tipo de enfoque facilita la comprensión del código, mejora la trazabilidad de los cambios y simplifica las tareas de mantenimiento.
+
+No obstante, la existencia de algunos \emph{tangled commits} indica que, en ciertos casos, se producen cambios más complejos que pueden dificultar el análisis y la evolución del software, tal y como se ha señalado en estudios previos sobre la calidad de los \emph{commits}.
+
+\section{Relación entre métricas}
+\label{sec:relaciones}
+
+El análisis de correlaciones entre métricas permite identificar relaciones significativas en el comportamiento de los \emph{commits}. En particular, se observa una fuerte correlación entre el número de ficheros modificados y las inserciones de código, lo que indica que los cambios más extensos tienden a afectar a múltiples partes del sistema.
+
+Por el contrario, la relación entre inserciones y eliminaciones es más moderada, lo que sugiere que no todos los cambios implican una sustitución directa de código existente, sino que en muchos casos se añaden nuevas funcionalidades o mejoras sin eliminar grandes cantidades de código previo.
+
+Estos resultados refuerzan la validez de las métricas empleadas y permiten comprender mejor la naturaleza de los cambios realizados en el repositorio.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -708,17 +812,15 @@ Si es una herramienta de análisis lo que has realizado, aquí puedes poner ejem
 \section{Consecución de objetivos}
 \label{sec:consecucion-objetivos}
 
-Esta sección es la sección espejo de las dos primeras del capítulo de objetivos, donde se planteaba el objetivo general y se elaboraban los específicos.
+El objetivo principal de este trabajo ha sido el diseño e implementación de una herramienta capaz de analizar repositorios de software basados en Git, con el fin de caracterizar los \emph{commits} y estudiar la evolución del desarrollo colaborativo.
 
-Es aquí donde hay que debatir qué se ha conseguido y qué no. 
-Cuando algo no se ha conseguido, se ha de justificar, en términos de qué problemas se han encontrado y qué medidas se han tomado para mitigar esos problemas.
+Este objetivo se ha alcanzado satisfactoriamente mediante el desarrollo de la herramienta \emph{RepoAnalyzer}, que permite la extracción automática de información de repositorios, el cálculo de métricas cuantitativas, la clasificación semántica de los \emph{commits} y la generación de informes estructurados.
 
-Y si has llegado hasta aquí, siempre es bueno pasarle el corrector ortográfico, que las erratas quedan fatal en la memoria final.
-Para eso, en Linux tenemos aspell, que se ejecuta de la siguiente manera desde la línea de \emph{shell}:
+En cuanto a los objetivos específicos, se ha conseguido implementar un modelo de datos adecuado para representar los \emph{commits}, así como un sistema de análisis que permite estudiar diferentes dimensiones del desarrollo, incluyendo métricas de tamaño, distribución de actividad entre desarrolladores, análisis temporal y detección de \emph{tangled commits}.
 
-\begin{verbatim}
-  aspell --lang=es_ES -c memoria.tex
-\end{verbatim}
+Se ha logrado validar el funcionamiento de la herramienta mediante su aplicación sobre repositorios reales, verificando la coherencia de los resultados obtenidos y contrastando métricas con herramientas externas como Git. La incorporación de pruebas automatizadas ha permitido reforzar la fiabilidad del sistema.
+
+En conjunto, los objetivos planteados al inicio del trabajo han sido cumplidos, proporcionando una herramienta funcional y útil para el análisis de repositorios de software.
 
 \section{Aplicación de lo aprendido}
 \label{sec:aplicacion}
