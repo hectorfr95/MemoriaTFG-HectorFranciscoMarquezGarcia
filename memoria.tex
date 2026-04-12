@@ -36,8 +36,8 @@
 % Dependiendo de las partes de la plantilla, a veces aparecerán tal
 % cual los escribas, a veces totalmente en mayúsculas, a veces de otras
 % formas
-\title{Título del Trabajo con Letras Mayúsculas para Sustantivos y Adjetivos}
-\author{Nombre del autor / autora}
+\title{Caracterización de Commits de Git en Proyectos Software}
+\author{Héctor Francisco Márquez García}
 
 % Guarda el título, el autor y la fecha en variables
 \makeatletter
@@ -68,11 +68,11 @@ ESCUELA DE INGENIERÍA DE FUENLABRADA
 \vspace{1cm}
 
 \LARGE
-TITULACIÓN EN MAYÚSCULAS
+GRADO EN INGENIERIA EN TECNOLOGIAS DE LA TELECOMUNICACIÓN 
 
 \vspace{1cm}
 \LARGE
-\textbf{TRABAJO FIN DE GRADO/MÁSTER}
+\textbf{TRABAJO FIN DE GRADO}
 
 \vspace{2cm}
 
@@ -83,12 +83,11 @@ TITULACIÓN EN MAYÚSCULAS
 
 \large
 Autor : \theauthor \\
-Tutor : Dr. Nombre del Profesor/a\\
-Cotutor: (si procede)
+Tutor : Dr. Gregorio Robles Martínez\\
 \vspace{1cm}
 
 \large
-Curso académico 202X/202X
+Curso académico 2025/2026
 
 \end{center}
 \end{titlepage}
@@ -115,7 +114,7 @@ Curso académico 202X/202X
 %\includegraphics[scale=0.6]{img/by}
 
 %% Poner el año adecuado
-\noindent©2025 \theauthor  \\
+\noindent©2026 \theauthor  \\
 Algunos derechos reservados  \\
 Este documento se distribuye bajo la licencia \\
 ``Atribución-CompartirIgual 4.0 Internacional'' de Creative Commons, \\
@@ -190,9 +189,9 @@ As it is the translation of the ``Resumen'', which is supposed to be written at 
 %\addcontentsline{toc}{chapter}{Lista de figuras} % para que aparezca en el indice de contenidos
 \listoffigures % indice de figuras
 %%%% Índice de tablas
-%\cleardoublepage
+\cleardoublepage
 %\addcontentsline{toc}{chapter}{Lista de tablas} % para que aparezca en el indice de contenidos
-%\listoftables % indice de tablas
+\listoftables % indice de tablas
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -205,124 +204,46 @@ As it is the translation of the ``Resumen'', which is supposed to be written at 
 \label{sec:intro} % etiqueta para poder referenciar luego en el texto con ~\ref{sec:intro}
 \pagenumbering{arabic} % para empezar la numeración de página con números
 
-En este capítulo se introduce el proyecto.
-Debería tener información general sobre el mismo, dando la información sobre el contexto en el que se ha desarrollado.
+En las últimas décadas, el desarrollo de software colaborativo ha tenido un crecimiento significativo gracias al auge de los repositorios de código abierto y de plataformas de control de versiones distribuidas como Git. El software colaborativo es muy importante y utilizado en muchas industrias; todas estas compañías que desarrollan software necesitan tener un control sobre sus desarrollos colaborativos. Muchas de ellas utilizan Git como plataforma, sobre la cual tratará el estudio. 
 
-No te olvides de echarle un ojo a la página con los cinco errores de escritura más frecuentes\footnote{\url{http://www.tallerdeescritores.com/errores-de-escritura-frecuentes}}.
+Estos repositorios almacenan de forma detallada el historial evolutivo de los proyectos, abriendo la puerta a analizar cómo cambian los desarrollos a lo largo del tiempo mediante el estudio de los \emph{commits} realizados por los desarrolladores.
 
-Aconsejo a todo el mundo que mire y se inspire en memorias pasadas.
-Las memorias de los proyectos que he llevado yo están (casi) todas almacenadas en mi web del GSyC\footnote{\url{https://gsyc.urjc.es/~grex/pfcs/}}.
+Siempre que un desarrollador envía su propuesta, capturando el estado del proyecto o segmento de este para el desarrollo del software, necesita realizar un \emph{commit} con los cambios. Cada \emph{commit} representa una unidad de cambio que puede reflejar decisiones de diseño, correcciones de errores, mejoras funcionales o tareas de mantenimiento. Por tanto, el análisis de los \emph{commits} puede proporcionar información relevante sobre los patrones de desarrollo, la evolución del software y las prácticas de ingeniería empleadas en cada proyecto. Es posible detectar y estudiar, de acuerdo a los históricos almacenados en plataformas como Git, si se ha introducido un error debido a la gran cantidad de cambios aplicados en un mismo \emph{commit}, o evaluar qué desarrolladores han tenido mayor impacto en el desarrollo.
 
-En mayo de 2023 me apunté a un curso de innovación docente donde nos pidieron hacer un podcast con temática docente. Aproveché entonces para hacer un podcast de unos 30 minutos donde en los primeros quince minutos introducía LaTeX y la memoria, y en los segundos hacía hincapién en aquellas cosas que más os cuestan utilizar en la memoria: las figuras, las tablas y las citas. Podéis escuchar el podcast en Internet\footnote{\url{https://podcasters.spotify.com/pod/show/gregorio-robles9/episodes/Tu-memoria-de-Trabajo-Fin-de-Grado-o-de-Mster-en-LaTeX-e23hucr/a-a58kp2}}.
+Sin embargo, los repositorios de gran tamaño contienen una cantidad muy elevada de información, lo que dificulta su análisis manual. En este contexto, resulta necesario desarrollar herramientas automáticas capaces de extraer métricas, clasificar cambios y generar análisis empíricos que faciliten la comprensión de la evolución del software, para poder analizar cualquier posible falla o estudiar el comportamiento entre los desarrolladores.Por eso se decidió realizar este estudio y herramienta \emph{RepoAnalyzer}, la cual nos ayudara a categorizar y realizar un estudio que ayude a comprender el evolutivo de los desarrollos colaborativos.
 
 
-\section{Sección}
-\label{sec:seccion}
+\section{Contexto}
+\label{sec:contexto}
 
-Esto es una sección, que es una estructura menor que un capítulo. 
+\subsection{Repositorios de software libre}
+\label{subsec:repositorios}
 
-Por cierto, a veces me comentáis que no os compila por las tildes.
-Eso es un problema de codificación.
-Al guardar el archivo, guardad la codificación de ``ISO-Latin-1'' a ``UTF-8'' (o viceversa) y funcionará.
+Los repositorios de software libre constituyen la base del desarrollo colaborativo moderno. Plataformas como GitHub o GitLab permiten almacenar el código fuente de los proyectos, gestionar versiones y coordinar el trabajo de múltiples desarrolladores distribuidos geográficamente. En un mundo donde se habitúa el trabajo y las colaboraciones desde diversos lugares del mundo, estas plataformas se han vuelto esenciales. Esto permite trabajar de forma continua en el desarrollo del software y aportar nuevas ideas o puntos de vista, aportando conocimiento de cualquier parte del planeta. Estas plataformas se manejan con unidades de cambio que se fusionan con el proyecto, estas unidades de cambio se denominan \emph{commit}.
 
-\subsection{Estilo}
-\label{subsec:estilo}
+Estos repositorios no solo contienen el código actual del proyecto, sino también todo su historial de cambios, lo que permite analizar su evolución a lo largo del tiempo. Esta característica resulta especialmente relevante en el ámbito de la ingeniería del software, ya que proporciona una fuente de datos rica para estudios empíricos sobre desarrollo colaborativo.
 
-Recomiendo leer los consejos prácticos sobre escribir documentos científicos en \LaTeX \ de Diomidis Spinellis\footnote{\url{https://github.com/dspinellis/latex-advice}}.
+Además, muchos de estos proyectos son utilizados en entornos reales, desde librerías de programación hasta sistemas completos, lo que convierte su análisis en una oportunidad para comprender cómo se construye software a gran escala en contextos reales.
 
-Lee sobre el uso de las comas\footnote{\url{http://narrativabreve.com/2015/02/opiniones-de-un-corrector-de-estilo-11-recetas-para-escribir-correctamente-la-coma.html}}. 
-Las comas en español no se ponen al tuntún.
-Y nunca, nunca entre el sujeto y el predicado (p.ej. en ``Yo, hago el TFG'' sobre la coma).
-La coma no debe separar el sujeto del predicado en una oración, pues se cortaría la secuencia natural del discurso.
-No se considera apropiado el uso de la llamada coma respiratoria o \emph{coma criminal}.
-Solamente se suele escribir una coma para marcar el lugar que queda cuando omitimos el verbo de una oración, pero es un caso que se da de manera muy infrecuente al escribir un texto científico (p.ej. ``El Real Madrid, campeón de Europa'').
+\subsection{Concepto de commit}
+\label{subsec:commit}
 
-A continuación, viene una figura, la Figura~\ref{figura:foro_hilos}. 
-Observarás que el texto dentro de la referencia es el identificador de la figura (que se corresponden con el ``label'' dentro de la misma). 
-También habrás tomado nota de cómo se ponen las ``comillas dobles'' para que se muestren correctamente. 
-Nota que hay unas comillas de inicio (``) y otras de cierre (''), y que son diferentes.
-Volviendo a las referencias, nota que al compilar, la primera vez se crea un diccionario con las referencias, y en la segunda compilación se ``rellenan'' estas referencias. 
-Por eso hay que compilar dos veces tu memoria.
-Si no, no se crearán las referencias.
+Un \emph{commit} representa una unidad de cambio dentro de un repositorio de software. Cada \emph{commit} registra una serie de modificaciones realizadas sobre uno o varios ficheros, junto con información asociada como el autor, la fecha y un mensaje descriptivo de la finalidad de esa aportación.
 
+Desde el punto de vista del desarrollo, los \emph{commits} pueden corresponder a diferentes tipos de actividades, como la corrección de errores, la incorporación de nuevas funcionalidades, tareas de mantenimiento o re-factorización del código. Esta diversidad de propósitos hace que el análisis de los mensajes de \emph{commit} sea especialmente útil para comprender la naturaleza de los cambios realizados, siempre y cuando sean organizados y no se mezclen diferentes finalidades en un mismo \emph{commit}.
 
+Asimismo, el tamaño de un \emph{commit}, medido en número de ficheros modificados o líneas de código afectadas, puede proporcionar información relevante sobre la complejidad del cambio. En este contexto, resulta de interés identificar \emph{commits} que agrupan múltiples modificaciones independientes, conocidos como \emph{tangled commits}, ya que pueden dificultar el mantenimiento y la comprensión del código.
 
- \begin{figure}
-    \centering
-    \includegraphics[bb=0 0 800 600, width=12cm, keepaspectratio]{img/foro1}
-    \caption{Página con enlaces a hilos}
-    \label{figura:foro_hilos}
- \end{figure}
+\subsection{Evolución del desarrollo colaborativo}
+\label{subsec:evolucion}
 
+El desarrollo de software colaborativo ha crecido de forma significativa en los últimos años, impulsado por la adopción de herramientas de control de versiones distribuidas y plataformas de colaboración en línea. Este crecimiento ha dado lugar a proyectos de gran escala, con miles de desarrolladores contribuyendo de manera simultánea.
 
-A continuación un bloque ``verbatim'', que se utiliza para mostrar texto tal cual.
-Se puede utilizar para ofrecer el contenido de correos electrónicos, código, entre otras cosas.
+Como consecuencia, los repositorios software actuales contienen grandes volúmenes de información histórica, lo que plantea nuevos retos en su análisis. Comprender cómo evolucionan estos proyectos, cómo se distribuye el trabajo entre los desarrolladores o qué patrones siguen los cambios realizados se ha convertido en un área de interés dentro de la ingeniería del software~\cite{hassan2008road}.
 
+Diversos estudios han analizado la evolución de proyectos de software libre desde distintas perspectivas. Por ejemplo, trabajos como el de Mockus et al.~\cite{mockus2002two} estudian el desarrollo de grandes proyectos colaborativos, evidenciando diferencias significativas en la organización y dinámica de trabajo entre comunidades abiertas y entornos corporativos. Asimismo, investigaciones posteriores han profundizado en el análisis de historiales de \emph{commits} como fuente de información para comprender el comportamiento de los desarrolladores y la evolución del software.
 
-{\footnotesize
-\begin{verbatim}
-    From gaurav at gold-solutions.co.uk  Fri Jan 14 14:51:11 2005
-    From: gaurav at gold-solutions.co.uk (gaurav_gold)
-    Date: Fri Jan 14 19:25:51 2005
-    Subject: [Mailman-Users] mailman issues
-    Message-ID: <003c01c4fa40$1d99b4c0$94592252@gaurav7klgnyif>
-
-    Dear Sir/Madam,
-    How can people reply to the mailing list?  How do i turn off
-    this feature? How can i also enable a feature where if someone
-    replies the newsletter the email gets deleted?
-    Thanks
-
-    From msapiro at value.net  Fri Jan 14 19:48:51 2005
-    From: msapiro at value.net (Mark Sapiro)
-    Date: Fri Jan 14 19:49:04 2005
-    Subject: [Mailman-Users] mailman issues
-    In-Reply-To: <003c01c4fa40$1d99b4c0$94592252@gaurav7klgnyif>
-    Message-ID: <PC173020050114104851057801b04d55@msapiro>
-
-    gaurav_gold wrote:
-    >How can people reply to the mailing list?  How do i turn off
-    this feature? How can i also enable a feature where if someone
-    replies the newsletter the email gets deleted?
-
-    See the FAQ
-    >Mailman FAQ: http://www.python.org/cgi-bin/faqw-mm.py
-    article 3.11
-\end{verbatim}
-}
-
-
-
-\section{Estructura de la memoria}
-\label{sec:estructura}
-
-
-\begin{figure}
-  \centering
-  \includegraphics[width=9cm, keepaspectratio]{img/arquitectura.png}
-  \caption{Estructura del parser básico}
-  \label{fig:arquitectura}
-\end{figure}
-
-
-
-
-En esta sección se debería introducir la estructura de la memoria. 
-
-Así:
-
-
-\begin{itemize}
-  \item En el primer capítulo se hace una intro al proyecto.
-  
-  \item En el capítulo~\ref{chap:objetivos} (ojo, otra referencia automática) se muestran los objetivos del proyecto.
-  
-  \item A continuación se presenta el estado del arte en el capítulo~\ref{chap:estado}.
-  
-  \item \ldots
-\end{itemize}
-
-
+En este contexto, el desarrollo de herramientas como \emph{RepoAnalyzer} permite abordar estos retos mediante el análisis automático de los historiales de \emph{commits}. Este tipo de herramientas facilita la obtención de métricas y la identificación de patrones que serían difíciles de detectar mediante análisis manual.
 
 
 
@@ -338,26 +259,52 @@ Así:
 \section{Objetivo general} % título de sección (se muestra)
 \label{sec:objetivo-general} % identificador de sección (no se muestra, es para poder referenciarla)
 
-Aquí vendría el objetivo general en una frase:
-Mi trabajo fin de grado consiste en crear de una herramienta de análisis de los comentarios jocosos en repositorios de software libre alojados en la plataforma GitHub.
+El objetivo principal de este trabajo fin de grado es diseñar e implementar una herramienta capaz de analizar repositorios de software basados en Git, con el fin de caracterizar los \emph{commits} y estudiar la evolución del desarrollo colaborativo en proyectos de código abierto.
 
-Recuerda que los objetivos siempre vienen en infinitivo.
+Para ello, se pretende extraer y procesar información relevante del historial de cambios de los repositorios, permitiendo identificar patrones de desarrollo, analizar el comportamiento de los contribuidores y evaluar métricas relacionadas con la actividad del proyecto.
+
+La herramienta desarrollada, denominada \emph{RepoAnalyzer}, tiene como finalidad automatizar este proceso de análisis, facilitando el estudio empírico de repositorios software reales y proporcionando una visión estructurada de su evolución.
 
 
 \section{Objetivos específicos}
 \label{sec:objetivos-especificos}
 
-Los objetivos específicos se pueden entender como las tareas en las que se ha desglosado el objetivo general.
-Y, sí, también vienen en infinitivo.
+Para alcanzar el objetivo general planteado, se han definido los siguientes objetivos específicos:
+
+\begin{itemize}
+
+\item Analizar documentación técnica y estudios previos relacionados con la minería de repositorios software y su evolución en los desarrollos colaborativos , con el fin de identificar métricas, enfoques y metodologías relevantes aplicables al desarrollo de la herramienta.
+
+\item Obtener información de repositorios Git a partir de su URL, permitiendo la descarga y el procesamiento de su historial de \emph{commits}, incluyendo autor, fecha, mensaje y métricas asociadas.
+
+\item Diseñar un modelo de datos que represente de forma estructurada la información relevante de cada \emph{commit}, incluyendo autor, fecha, mensaje y métricas asociadas.
+
+\item Implementar un sistema de clasificación semántica de \emph{commits} basado en palabras clave, que permita categorizar los cambios según su propósito.
+
+\item Calcular métricas cuantitativas relacionadas con los \emph{commits}, como número de ficheros modificados, inserciones y eliminaciones.
+
+\item Analizar la distribución de actividad entre los desarrolladores, identificando patrones de contribución dentro del repositorio.
+
+\item Estudiar los intervalos temporales entre \emph{commits}, con el objetivo de caracterizar el ritmo de desarrollo del proyecto.
+
+\item Detectar \emph{tangled commits}, es decir, cambios que agrupan múltiples modificaciones en un único \emph{commit}, y analizar su impacto.
+
+\item Generar informes automáticos en distintos formatos (CSV, JSON y Excel) que faciliten la interpretación de los resultados obtenidos.
+
+\end{itemize}
 
 
 \section{Planificación temporal}
 \label{sec:planificacion-temporal}
+El desarrollo de este trabajo fin de grado se ha llevado a cabo a lo largo de varios meses, combinando su realización con la actividad laboral y el estudio académico. La mayor parte del trabajo se ha realizado fuera del horario laboral, incluyendo fines de semana y periodos vacacionales.
 
-A mí me gusta que aquí pongáis una descripción de lo que os ha llevado realizar el trabajo.
-Hay gente que añade un diagrama de GANTT.
-Lo importante es que quede claro cuánto tiempo llevas (tiempo natural, p.ej., 6 meses) y a qué nivel de esfuerzo (p.ej., principalmente los fines de semana).
+En una primera fase se realizó el análisis del problema y la revisión del estado del arte, con el objetivo de comprender las distintas aproximaciones existentes en el ámbito del análisis de repositorios software.
 
+Posteriormente, se abordó el diseño e implementación de la herramienta \emph{RepoAnalyzer}, desarrollando de forma iterativa los distintos módulos encargados de la extracción, procesamiento y análisis de los datos.
+
+Finalmente, se llevó a cabo la validación del sistema mediante la ejecución de la herramienta sobre distintos repositorios reales, así como la redacción de la memoria del trabajo.
+
+Este enfoque progresivo ha permitido compaginar el desarrollo técnico del proyecto con la documentación del mismo, asegurando la coherencia entre los objetivos planteados y los resultados obtenidos.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -368,74 +315,52 @@ Lo importante es que quede claro cuánto tiempo llevas (tiempo natural, p.ej., 6
 \chapter{Estado del arte}
 \label{chap:estado}
 
-Descripción de las tecnologías que utilizas en tu trabajo. 
-Con dos o tres párrafos por cada tecnología, vale. 
-Se supone que aquí viene todo lo que no has hecho tú.
+En esta sección se mencionará el estado actual de las tecnologías sin las que no hubiera sido posible la ejecución de este trabajo.
 
-Puedes citar libros, como el de Bonabeau et al., sobre procesos estigmérgicos~\cite{bonabeau:_swarm}. 
-Me encantan los procesos estigmérgicos.
-Deberías leer más sobre ellos.
-Pero quizás no ahora, que tenemos que terminar la memoria para sacarnos por fin el título.
-Nota que el \~ \ añade un espacio en blanco, pero no deja que exista un salto de línea. 
-Imprescindible ponerlo para las citas.
+\section{Mining Software Repositories}
+\label{sec:msr}
 
-Citar es importantísimo en textos científico-técnicos. 
-Porque no partimos de cero.
-Es más, partir de cero es de tontos; lo suyo es aprovecharse de lo ya existente para construir encima y hacer cosas más sofisticadas.
-¿Dónde puedo encontrar textos científicos que referenciar?
-Un buen sitio es Google Scholar\footnote{\url{http://scholar.google.com}}.
-Por ejemplo, si buscas por ``stigmergy libre software'' para encontrar trabajo sobre software libre y el concepto de \emph{estigmergia} (¿te he comentado que me gusta el concepto de estigmergia ya?), encontrarás un artículo que escribí hace tiempo cuyo título es ``Self-organized development in libre software: a model based on the stigmergy concept''.
-Si pulsas sobre las comillas dobles (entre la estrella y el ``citado por ...'', justo debajo del extracto del resumen del artículo, te saldrá una ventana emergente con cómo citar.
-Abajo a la derecha, aparece un enlace BibTeX.
-Púlsalo y encontrarás la referencia en formato BibTeX, tal que así:
+El análisis de repositorios software, conocido como \emph{Mining Software Repositories} (MSR), es un área de investigación centrada en la extracción de conocimiento a partir de los datos históricos generados durante el desarrollo de software.
 
-{\footnotesize
-\begin{verbatim}
-@inproceedings{robles2005self,
-  title={Self-organized development in libre software:
-         a model based on the stigmergy concept},
-  author={Robles, Gregorio and Merelo, Juan Juli\'an 
-          and Gonz\'alez-Barahona, Jes\'us M.},
-  booktitle={ProSim'05},
-  year={2005}
-}
-\end{verbatim}
-}
+Los repositorios de control de versiones, sistemas de seguimiento de errores y plataformas de colaboración almacenan grandes volúmenes de información que pueden ser utilizados para estudiar el comportamiento entre los desarrolladores, la evolución del software y la calidad del código.
 
-Copia el texto en BibTeX y pégalo en el fichero \texttt{memoria.bib}, que es donde están las referencias bibliográficas.
-Para incluir la referencia en el texto de la memoria, deberás citarlo, como hemos hecho antes con~\cite{bonabeau:_swarm}, lo que pasa es que en vez de el identificador de la cita anterior (bonabeau:\_swarm), tendrás que poner el nuevo (robles2005self).
-Compila el fichero \texttt{memoria.tex} (\texttt{pdflatex memoria.tex}), añade la bibliografía (\texttt{bibtex memoria.aux}) y vuelve a compilar \texttt{memoria.tex} (\texttt{pdflatex memoria.tex})\ldots y \emph{voilà} ¡tenemos una nueva cita~\cite{robles2005self}!
+Hassan~\cite{hassan2008road} destaca que estos repositorios constituyen una fuente valiosa de información detallada, permitiendo analizar patrones de desarrollo y mejorar los procesos de ingeniería del software. Este enfoque ha dado lugar a numerosos estudios que utilizan métricas derivadas de los historiales de cambios para comprender mejor cómo se construyen y mantienen los desarrollos software.
 
-También existe la posibilidad de poner notas al pie de página, por ejemplo, una para indicarte que visite la página del GSyC\footnote{\url{http://gsyc.es}}.
+\section{Clasificación semántica de commits}
+\label{sec:clasificacion}
 
+Uno de los aspectos más relevantes en el análisis de repositorios software es la clasificación de los \emph{commits} según su propósito. Los mensajes de \emph{commit} permiten identificar la intención del cambio realizado, como la corrección de errores, la implementación de nuevas funcionalidades o tareas de mantenimiento, en base de la clasificación que el desarrollador a establecido a cada \emph{commit}.
 
+Diversos trabajos han propuesto enfoques para clasificar automáticamente los \emph{commits} utilizando técnicas basadas en palabras clave o métodos de aprendizaje automático. Estas clasificaciones permiten analizar la distribución de tipos de cambios dentro de un proyecto y estudiar la evolución de las actividades de desarrollo.
 
-\section{Sección 1} 
-\label{sec:seccion1}
+La clasificación semántica de los \emph{commits} resulta especialmente útil para comprender el comportamiento de los desarrolladores y la naturaleza de los cambios realizados a lo largo del tiempo. Con estos estudios se podrá dar una perspectiva de previsión de errores enfatizando la revisión del código cuando se observen ciertos patrones, además mejorar la carga de trabajo entre los desarrolladores.
 
-Hemos hablado de cómo incluir figuras.
-Pero no hemos dicho nada de tablas.
-A mí me gustan las tablas.
-Mucho.
-Aquí un ejemplo de tabla, la Tabla~\ref{tab:ejemplo} (siento ser pesado, pero nota cómo he puesto la referencia).
+\section{Tangled commits}
+\label{sec:tangled}
 
-\begin{table}
- \begin{center}
-  \begin{tabular}{ | l | c | r |} % tenemos tres colummnas, la primera alineada a la izquierda (l), la segunda al centro (c) y la tercera a la derecha (r). El | indica que entre las columnas habrá una línea separadora.
-    \hline
-    Uno & 2 & 3 \\ \hline % el hline nos da una línea vertical
-    Cuatro & 5 & 6 \\ \hline
-    Siete & 8 & 9 \\
-    \hline
-  \end{tabular}
-  \caption{Ejemplo de tabla. Aquí viene una pequeña descripción (el \emph{caption}, el pie de tabla/figura) del contenido de la tabla. Si la tabla no es autoexplicativa, siempre viene bien aclararla aquí.}
-  \label{tab:ejemplo}
- \end{center}
-\end{table}
+Un problema identificado en el análisis de repositorios software es la existencia de \emph{tangled commits}, es decir, \emph{commits} que agrupan múltiples cambios lógicos en una única unidad.
 
-Hay un sitio en Internet donde puedes diseñar las tablas fácilmente y luego hacer un corta y pega del resultado en tu editor.
-Puedes probarlo en \url{https://www.tablesgenerator.com/}.
+Herzig et al.~\cite{herzig2013impact} analizan el impacto de este tipo de cambios en modelos de predicción de defectos, mostrando que los \emph{commits} pueden contener modificaciones heterogéneas que dificultan su interpretación y análisis automático, es decir, a la hora de clasificacion, un \emph{commit} puede venir asignado para una nueva funcionalidad, pero el \emph{commit} incluye además arreglos en otras zonas. Con este ultimo punto mencionado, se hace complicado la categorización de los \emph{commits} y su correcto estudio.
 
+La presencia de \emph{tangled commits} introduce ruido en los estudios empíricos, ya que un único \emph{commit} puede incluir cambios de distinta naturaleza. Por ello, su identificación y análisis resulta relevante para mejorar la calidad de los estudios sobre evolución del software.
+
+\section{Métricas y evolución del software}
+\label{sec:metricas}
+
+El estudio de la evolución del software se basa en el análisis de métricas derivadas de los historiales de cambios. Entre las métricas más utilizadas se encuentran el número de \emph{commits}, el tamaño de los cambios, el número de desarrolladores y la frecuencia de actividad.
+
+Mockus et al.~\cite{mockus2002two} analizan proyectos de software libre como Apache y Mozilla, mostrando que la actividad de desarrollo suele concentrarse en un número reducido de contribuidores. Este tipo de análisis permite identificar patrones de colaboración y entender la dinámica de los desarrolladores en los proyectos.
+
+Asimismo, el análisis temporal de los \emph{commits} permite estudiar el ritmo de desarrollo, identificar periodos de mayor actividad y comprender la evolución del proyecto a lo largo del tiempo.
+
+\section{Limitaciones de los estudios existentes}
+\label{sec:limitaciones}
+
+A pesar de los avances en el análisis de repositorios software, muchos estudios se centran en aspectos específicos de forma aislada, como el tamaño de los \emph{commits} o la clasificación de cambios.
+
+Esta fragmentación dificulta la obtención de una visión global de la evolución del software, ya que no se integran diferentes dimensiones de análisis en un mismo enfoque.
+
+En este contexto, surge la necesidad de desarrollar herramientas que permitan combinar métricas cuantitativas, clasificación semántica y análisis temporal, proporcionando una visión más completa del comportamiento de los proyectos software.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
