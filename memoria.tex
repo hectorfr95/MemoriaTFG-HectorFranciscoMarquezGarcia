@@ -821,28 +821,47 @@ En cuanto a los objetivos específicos, se ha conseguido implementar un modelo d
 Se ha logrado validar el funcionamiento de la herramienta mediante su aplicación sobre repositorios reales, verificando la coherencia de los resultados obtenidos y contrastando métricas con herramientas externas como Git. La incorporación de pruebas automatizadas ha permitido reforzar la fiabilidad del sistema.
 
 En conjunto, los objetivos planteados al inicio del trabajo han sido cumplidos, proporcionando una herramienta funcional y útil para el análisis de repositorios de software.
-
 \section{Aplicación de lo aprendido}
 \label{sec:aplicacion}
 
-Aquí viene lo que has aprendido durante el Grado/Máster y que has aplicado en el TFG/TFM.
-Una buena idea es poner las asignaturas más relacionadas y comentar en un párrafo los conocimientos y habilidades puestos en práctica.
+Durante el desarrollo de este trabajo se han aplicado diversos conocimientos adquiridos a lo largo del grado, especialmente en el ámbito del desarrollo de software y el tratamiento de datos.
+
+En particular, asignaturas como \emph{Servicios y Aplicaciones Telemáticas} y \emph{Desarrollo de Aplicaciones Telemáticas} han proporcionado una base fundamental para la realización del proyecto.
+
+De forma más concreta, se han puesto en práctica los siguientes conocimientos y habilidades:
 
 \begin{enumerate}
-  \item a
-  \item b
+    \item Diseño y estructuración de un proyecto en Python, aplicando buenas prácticas de organización del código.
+    
+    \item Desarrollo de una arquitectura modular, que permite dividir la herramienta en distintos componentes independientes, facilitando su mantenimiento, evolución y reutilización.
+    
+    \item Comunicación con servicios externos y recopilación de datos desde plataformas web, en este caso repositorios de software.
+    
+    \item Cálculo de métricas estadísticas, como medias y percentiles, para el análisis de la actividad de los \emph{commits}.
 \end{enumerate}
 
-
+Estos conocimientos han permitido abordar el desarrollo de la herramienta \emph{RepoAnalyzer} de forma estructurada, aplicando principios propios de la ingeniería del software.
 \section{Lecciones aprendidas}
 \label{sec:lecciones_aprendidas}
 
-Aquí viene lo que has aprendido en el Trabajo Fin de Grado/Máster.
+El desarrollo de este trabajo ha permitido adquirir y reforzar diversas habilidades prácticas relacionadas con el análisis de repositorios de software y el tratamiento de datos.
+
+Entre las principales lecciones aprendidas destacan:
 
 \begin{enumerate}
-  \item Aquí viene uno.
-  \item Aquí viene otro.
+    \item Aunque tenia conocimientos sobre la extracción de datos desde plataformas de desarrollo software no siempre es igual, siendo necesario aprender y entender que cada aplicación muestra los datos de una forma posible. Y a tener en cuenta posibles inconsistencias en la información obtenida y tener que filtrar dicha información previa a su análisis.
+    
+    \item La importancia del modelado de datos, ya que definir una estructura adecuada permite simplificar significativamente los procesos posteriores de análisis.
+    
+    \item La dificultad de analizar y categorizar datos de forma automática, especialmente en el caso de los mensajes de \emph{commit}, que no siempre siguen una estructura homogénea.
+    
+    \item Como se generan informes en distintos formatos, sin embargo, esto aporta una mayor facilidad para la interpretación de los resultados y su uso en diferentes contextos.
+    
+    \item Comprensión del comportamiento de los desarrollos de software colaborativos, observando que la actividad suele concentrarse en un núcleo reducido de desarrolladores, mientras que existe un conjunto más amplio de contribuidores ocasionales. Asimismo, se ha identificado que en proyectos maduros predominan las tareas de mantenimiento y corrección frente a la incorporación de nuevas funcionalidades, lo que refleja patrones característicos en la evolución del software de código abierto.
+    
 \end{enumerate}
+
+Asimismo, este trabajo ha permitido comprender mejor el funcionamiento interno de los repositorios de software y la complejidad asociada al análisis de su evolución, aportando una visión más completa del desarrollo colaborativo en entornos reales.
 
 \section{Declaración de Uso de Inteligencia Artificial}
 \label{sec:uso_ia}
@@ -852,7 +871,7 @@ En este apartado se debería especificar el uso de inteligencia artificial, en p
 A continuación se muestra un ejemplo de cómo se podría declarar el uso de IA en un trabajo:
 
 \begin{itemize}
-    \item \textbf{Herramientas utilizadas:} Se han empleado las herramientas \textit{[p.ej., ChatGPT-4o de OpenAI, Claude 3 de Anthropic y DeepL]}.
+    \item \textbf{Herramientas utilizadas:} Se han empleado las herramientas \textit{[p.ej., ChatGPT-4o de OpenAI, Claude 3 de Anthropic, DeepL y Wirtefull]}.
     
     \item \textbf{Alcance de la aplicación:} El uso de dichas herramientas se ha limitado exclusivamente a las siguientes tareas auxiliares:
 
@@ -872,9 +891,17 @@ A continuación se muestra un ejemplo de cómo se podría declarar el uso de IA 
 \section{Trabajos futuros}
 \label{sec:trabajos_futuros}
 
-Ningún proyecto ni software se termina, así que aquí vienen ideas y funcionalidades que estaría bien tener implementadas en el futuro.
+A pesar de los resultados obtenidos, existen diversas líneas de mejora y ampliación que podrían abordarse en futuros trabajos.
 
-Es un apartado que sirve para dar ideas de cara a futuros TFGs/TFMs.
+En primer lugar, se podría mejorar el sistema de clasificación semántica mediante el uso de técnicas de aprendizaje automático o procesamiento del lenguaje natural más avanzadas, que permitan una categorización más precisa de los \emph{commits}.
+
+También sería interesante ampliar el análisis a otros aspectos del repositorio, como el estudio de ramas, \emph{pull requests} o incidencias, lo que permitiría obtener una visión más completa del proceso de desarrollo.
+
+Otra posible mejora consiste en optimizar el rendimiento de la herramienta para su aplicación en repositorios de gran escala, así como desarrollar una interfaz gráfica que facilite su uso por parte de usuarios no técnicos.
+
+Se podría aplicar la herramienta a un conjunto más amplio de repositorios con el objetivo de realizar estudios comparativos y extraer conclusiones más generales sobre el desarrollo de software colaborativo.
+
+Finalmente, se podría realizar una herramienta o script automatizado para ejecutar la herramienta \emph{RepoAnalyzer} periódicamente sobre un repositorio para llevar un análisis periódico sobre el repositorio.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -887,9 +914,111 @@ Es un apartado que sirve para dar ideas de cara a futuros TFGs/TFMs.
 \chapter{Manual de usuario}
 \label{app:manual}
 
-Esto es un apéndice.
-Si has creado una aplicación, siempre viene bien tener un manual de usuario.
-Pues ponlo aquí.
+\section{Introducción}
+\label{sec:intro_manual}
+
+La herramienta \emph{RepoAnalyzer} permite analizar repositorios de software basados en Git\footnote{Sitio oficial del proyecto Git: \url{https://git-scm.com/}} con el objetivo de extraer métricas y caracterizar los \emph{commits} realizados a lo largo del tiempo.
+
+Su uso está orientado a la obtención de información sobre la evolución del desarrollo colaborativo, permitiendo analizar patrones de contribución, clasificación de cambios y métricas asociadas a los \emph{commits}.
+
+\section{Requisitos}
+\label{sec:requisitos}
+
+Antes de ejecutar la herramienta, es necesario que el sistema disponga de los siguientes componentes previamente instalados:
+
+\begin{itemize}
+    \item \textbf{Python 3.10 o superior}, correctamente añadido al PATH del sistema.
+    
+    \item \textbf{Git}, necesario para la clonación y análisis de repositorios.
+    
+    \item \textbf{pip}, gestor de paquetes de Python, para la instalación de dependencias.
+    
+    \item \textbf{Conexión a Internet}, para acceder y clonar repositorios remotos.
+\end{itemize}
+
+En caso de no disponer de alguno de estos componentes, deberán instalarse previamente desde sus páginas oficiales.
+
+\section{Instalación}
+\label{sec:instalacion}
+
+La herramienta \emph{RepoAnalyzer} se distribuye como un paquete comprimido en formato ZIP.
+
+En primer lugar, se debe descomprimir el archivo en una ubicación del sistema. Una vez extraído, se accede al directorio del proyecto desde la línea de comandos:
+
+\begin{verbatim}
+cd RepoAnalyzer
+\end{verbatim}
+
+A continuación, se recomienda crear un entorno virtual para aislar las dependencias del proyecto:
+
+\begin{verbatim}
+python -m venv .venv
+\end{verbatim}
+
+Una vez creado el entorno virtual, se debe activar:
+
+\begin{verbatim}
+.venv\Scripts\activate   % En Windows
+\end{verbatim}
+
+Finalmente, se instalan las dependencias necesarias mediante:
+
+\begin{verbatim}
+pip install -r requirements.txt
+\end{verbatim}
+
+En sistemas Windows, es importante asegurarse de que tanto Python como Git se encuentran correctamente configurados en las variables de entorno (PATH), para poder ejecutar los comandos desde la línea de comandos.
+\section{Ejecución}
+\label{sec:ejecucion_manual}
+
+La herramienta se ejecuta desde línea de comandos indicando la URL del repositorio que se desea analizar:
+
+\begin{verbatim}
+python repoanalyzer.py <url_repositorio>
+\end{verbatim}
+
+Por ejemplo:
+
+\begin{verbatim}
+python main.py https://github.com/psf/requests.git
+\end{verbatim}
+
+Una vez ejecutada, la herramienta realiza automáticamente los siguientes pasos:
+
+\begin{itemize}
+    \item Clonado del repositorio
+    \item Extracción del historial de \emph{commits}
+    \item Procesamiento y análisis de los datos
+    \item Generación de métricas y resultados
+\end{itemize}
+
+\section{Interpretación de resultados}
+\label{sec:interpretacion}
+
+Tras la ejecución, la herramienta genera distintos tipos de salida:
+
+\begin{itemize}
+    \item Resumen general del repositorio (número de \emph{commits}, autores, etc.)
+    \item Clasificación semántica de los \emph{commits}
+    \item Análisis de \emph{tangled commits}
+    \item Métricas estadísticas y temporales
+    \item Ficheros de salida en formato CSV y JSON en la carpeta output. Tenga en cuenta que se generará el fichero de la siguiente manera:
+    \begin{verbatim}
+    <nombre_repositorio>_<timestamp>_<tipo_analisis>.<formato>
+    \end{verbatim}
+    Donde:
+
+\begin{itemize}
+    \item \texttt{<nombre\_repositorio>} corresponde al nombre del repositorio analizado.
+    \item \texttt{<timestamp>} indica la fecha y hora de generación del fichero en formato \texttt{YYYY-MM-DD\_HHMM}.
+    \item \texttt{<tipo\_analisis>} describe el contenido del fichero generado (por ejemplo, intervalos, clasificación o análisis de \emph{tangled commits}).
+    \item \texttt{<formato>} corresponde al tipo de fichero generado, como CSV o JSON.
+\end{itemize}
+\end{itemize}
+
+Estos resultados permiten analizar el comportamiento del desarrollo del proyecto, identificar patrones de contribución y evaluar la calidad de los cambios realizados.
+
+Los ficheros generados pueden ser utilizados para análisis posteriores o visualización mediante herramientas externas.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
