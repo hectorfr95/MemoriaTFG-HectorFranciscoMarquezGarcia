@@ -148,31 +148,31 @@ Además, la pareja quizás no sea para siempre, pero tu madre sí.
 %%%% Resumen
 
 \chapter*{Resumen}
-%\addcontentsline{toc}{chapter}{Resumen} % si queremos que aparezca en el índice
+\addcontentsline{toc}{chapter}{Resumen} % si queremos que aparezca en el índice
 \markboth{RESUMEN}{RESUMEN} % encabezado
 
-Aquí viene un resumen del proyecto.
-Ha de constar de tres o cuatro párrafos, donde se presente de manera clara y concisa de qué va el proyecto. 
-Han de quedar respondidas las siguientes preguntas:
+En este trabajo fin de grado se presenta el diseño y desarrollo de una herramienta denominada \emph{RepoAnalyzer}, orientada al análisis de repositorios de software basados en Git. El objetivo principal del proyecto es caracterizar los \emph{commits} y estudiar la evolución del desarrollo colaborativo en proyectos de código abierto.
 
-\begin{itemize}
-  \item ¿De qué va este proyecto? ¿Cuál es su objetivo principal?
-  \item ¿Cómo se ha realizado? ¿Qué tecnologías están involucradas?
-  \item ¿En qué contexto se ha realizado el proyecto? ¿Es un proyecto dentro de un marco general?
-\end{itemize}
+El desarrollo de la herramienta se ha realizado utilizando Python, implementando mecanismos para la extracción automática del historial de \emph{commits}, el procesamiento de los datos y el cálculo de métricas cuantitativas, como el número de ficheros modificados, inserciones y eliminaciones. Asimismo, se ha incorporado un sistema de clasificación semántica basado en palabras clave, junto con funcionalidades de análisis temporal, estudio de contribuciones por desarrollador y detección de \emph{tangled commits}.
 
-Lo mejor es escribir el resumen al final.
+Este trabajo se enmarca dentro del ámbito de la ingeniería del software, concretamente en el área de minería de repositorios software, donde los historiales de cambios constituyen una fuente relevante de información para el análisis del desarrollo. La herramienta ha sido validada mediante su aplicación sobre repositorios reales, contrastando los resultados obtenidos con herramientas externas como Git y mediante la implementación de pruebas automatizadas.
+
+Los resultados obtenidos permiten identificar patrones relevantes en el desarrollo colaborativo, proporcionando una visión estructurada de la evolución del software en entornos reales.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Resumen en inglés
 
 \chapter*{Summary}
-%\addcontentsline{toc}{chapter}{Summary} % si queremos que aparezca en el índice
+\addcontentsline{toc}{chapter}{Summary} % si queremos que aparezca en el índice
 \markboth{SUMMARY}{SUMMARY} % encabezado
 
-Here comes a translation of the ``Resumen'' into English. 
-Please, double check it for correct grammar and spelling.
-As it is the translation of the ``Resumen'', which is supposed to be written at the end, this as well should be filled out just before submitting.
+This bachelor's thesis presents the design and development of a tool named \emph{RepoAnalyzer}, aimed at analyzing Git-based software repositories. The main objective is to characterize commits and study the evolution of collaborative development in open-source projects.
+
+The tool has been developed using Python and includes mechanisms for automatic extraction of commit history, data processing, and computation of quantitative metrics such as modified files, insertions, and deletions. Additionally, a keyword-based semantic classification system has been implemented, along with temporal analysis, contributor activity analysis, and detection of \emph{tangled commits}.
+
+This work is framed within the field of software engineering, specifically in the area of software repository mining, where version control histories provide valuable information for understanding development processes. The tool has been validated using real repositories, comparing results with external tools such as Git and through the implementation of automated tests.
+
+The obtained results allow the identification of relevant patterns in collaborative development, providing a structured view of software evolution in real-world environments.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
