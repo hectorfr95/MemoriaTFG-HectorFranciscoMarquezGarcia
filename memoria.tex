@@ -30,6 +30,8 @@
 \usepackage{float}  %% H para posicionar figuras
 \usepackage[nottoc, notlot, notlof, notindex]{tocbibind} %% Opciones de índice
 \usepackage{latexsym}  %% Logo LaTeX
+\usepackage{tikz} 
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric} %%este y el anterior para dibujar diagramas con TikZ
 
 % Escribe el título y el nombre del autor / autora para que se use bien
 % en otras partes de la plantilla
@@ -372,41 +374,285 @@ En este contexto, surge la necesidad de desarrollar herramientas que permitan co
 \chapter{Diseño e implementación}
 \label{sec:diseno}
 
-Aquí viene todo lo que has hecho tú (tecnológicamente). 
-Puedes entrar hasta el detalle. 
-Es la parte más importante de la memoria, porque describe lo que has hecho tú.
-Eso sí, normalmente aconsejo no poner código, sino diagramas.
-
-
 
 \section{Arquitectura general} 
 \label{sec:arquitectura}
 
-Si tu proyecto es un software, siempre es bueno poner la arquitectura (que es cómo se estructura tu programa a ``vista de pájaro'').
+La herramienta desarrollada, denominada \emph{RepoAnalyzer}, se ha diseñado siguiendo una arquitectura modular que permite separar las distintas responsabilidades del sistema en componentes independientes. Este enfoque facilita el mantenimiento del código, la reutilización de módulos y la extensión futura de la herramienta.
 
-\begin{figure}
-  \centering
-  \includegraphics[width=9cm, keepaspectratio]{img/arquitectura.png}
-  \caption{Estructura del parser básico}
-  \label{fig:arquitectura}
+A alto nivel, el sistema se compone de varios módulos principales que abarcan todo el flujo de procesamiento de los datos, desde la obtención del repositorio hasta la generación de informes finales.
+
+En primer lugar, el módulo de extracción se encarga de obtener la información del repositorio a partir de una URL proporcionada por el usuario, clonando el repositorio y extrayendo el historial de \emph{commits}. Posteriormente, estos datos son transformados en una estructura interna homogénea que permite su procesamiento.
+
+A continuación, el módulo de análisis procesa los \emph{commits} obtenidos, calculando métricas cuantitativas, clasificando semánticamente los cambios y realizando distintos análisis sobre la evolución del repositorio.
+
+Finalmente, el módulo de exportación genera informes en distintos formatos, como CSV, JSON y Excel, facilitando la interpretación de los resultados obtenidos.
+
+En la figura~\ref{fig:arquitectura} se muestra una representación general de la arquitectura del sistema, donde se pueden observar los distintos módulos y su interacción dentro del flujo de ejecución.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=1.4cm and 1.8cm,
+    box/.style={
+        rectangle,
+        rounded corners,
+        draw=black,
+        align=center,
+        minimum width=3.8cm,
+        minimum height=1cm
+    },
+    arrow/.style={
+        -{Latex[length=3mm]},
+        thick
+    }
+]
+
+\node[box] (input) {URL del repositorio};
+\node[box, below=of input] (git) {Módulo de extracción\\(\texttt{git\_reader})};
+\node[box, below=of git] (model) {Módulo de modelado de commits\\(\texttt{CommitRecord})};
+\node[box, below=of model] (analysis) {Módulo de análisis\\(\texttt{analysis})};
+\node[box, below left=of analysis] (classifier) {Clasificación semántica\\(\texttt{classifier})};
+\node[box, below right=of analysis] (metrics) {Cálculo de métricas\\RQ4-RQ7};
+\node[box, below=2cm of analysis] (export) {Módulo de exportación\\(\texttt{exporter} / \texttt{report})};
+\node[box, below left=of export] (csv) {CSV};
+\node[box, below=of export] (json) {JSON};
+\node[box, below right=of export] (xlsx) {Excel};
+
+\draw[arrow] (input) -- (git);
+\draw[arrow] (git) -- (model);
+\draw[arrow] (model) -- (analysis);
+\draw[arrow] (analysis) -- (classifier);
+\draw[arrow] (analysis) -- (metrics);
+\draw[arrow] (classifier) |- (export);
+\draw[arrow] (metrics) |- (export);
+\draw[arrow] (export) -- (csv);
+\draw[arrow] (export) -- (json);
+\draw[arrow] (export) -- (xlsx);
+
+\end{tikzpicture}
+\caption{Arquitectura general de la herramienta RepoAnalyzer}
+\label{fig:arquitectura}
 \end{figure}
 
+Como se observa en la figura~\ref{fig:arquitectura}, la herramienta parte de la URL de un repositorio Git proporcionada por el usuario. A partir de esta entrada, el módulo de extracción obtiene el historial de \emph{commits}, que posteriormente se transforma en una estructura interna mediante el modelo \texttt{CommitRecord}.
 
-Por ejemplo, puedes verlo en la figura~\ref{fig:arquitectura}.
-\LaTeX \ pone las figuras donde mejor cuadran. 
-Y eso quiere decir que quizás no lo haga donde lo hemos puesto\ldots 
-Eso no es malo.
-A veces queda un poco raro, pero es la filosofía de \LaTeX: tú al contenido, que yo me encargo de la maquetación.
+Sobre esta representación interna actúa el módulo de análisis, encargado tanto de la clasificación semántica de los \emph{commits} como del cálculo de métricas cuantitativas y temporales. Finalmente, los resultados obtenidos se envían al módulo de exportación, que genera distintos ficheros de salida en formatos CSV, JSON y Excel.
+
+\section{Flujo de procesamiento}
+\label{sec:flujo}
+
+El funcionamiento de la herramienta \emph{RepoAnalyzer} sigue un flujo de procesamiento secuencial que permite transformar la información de un repositorio Git en métricas e informes estructurados.
+
+En primer lugar, el usuario proporciona la URL de un repositorio como parámetro de entrada. A partir de esta entrada, el sistema verifica la disponibilidad de las herramientas necesarias y procede a clonar o actualizar el repositorio en local.
+
+Una vez obtenido el repositorio, se realiza la extracción del historial de \emph{commits}, recuperando información relevante como el autor, la fecha, el mensaje asociado y las métricas básicas del cambio (ficheros modificados, inserciones y eliminaciones).
+
+A continuación, estos datos son transformados en una estructura interna mediante el modelo \texttt{CommitRecord}, lo que permite desacoplar el formato original del repositorio de la lógica de análisis posterior y tener un mejor control sobre este.
+
+Sobre esta representación interna, el sistema ejecuta el módulo de análisis, donde se realizan distintas operaciones. Por un lado, se lleva a cabo la clasificación semántica de los \emph{commits}, asignando a cada uno una categoría en función de su mensaje. En particular, se han definido distintas categorías representativas del tipo de cambio, como \emph{corrective}, \emph{management}, \emph{forward}, \emph{reengineering} y \emph{merge}. Por otro, se calculan métricas cuantitativas y temporales que permiten caracterizar la actividad del repositorio, incluyendo el número de cambios, la distribución de autores, los intervalos entre \emph{commits} y la detección de \emph{tangled commits}.
+
+Finalmente, los resultados obtenidos son enviados al módulo de exportación, que genera informes en distintos formatos, como CSV, JSON y Excel. Estos artefactos permiten analizar los datos de forma estructurada y facilitan su utilización en estudios posteriores.
+
+Este flujo de procesamiento permite automatizar completamente el análisis de repositorios software, garantizando la reproducibilidad de los resultados y la aplicabilidad de la herramienta a distintos proyectos sin necesidad de modificaciones adicionales.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm,
+    box/.style={
+        rectangle,
+        rounded corners,
+        draw=black,
+        align=center,
+        minimum width=4.5cm,
+        minimum height=0.9cm
+    },
+    arrow/.style={
+        -{Latex[length=3mm]},
+        thick
+    }
+]
+
+\node[box] (c1) {Commits extraídos};
+\node[box, below=of c1] (c2) {Estructuración (CommitRecord)};
+\node[box, below=of c2] (c3) {Clasificación semántica};
+\node[box, below=of c3] (c4) {Cálculo de métricas};
+\node[box, below=of c4] (c5) {Detección de tangled commits};
+\node[box, below=of c5] (c6) {Consolidación de resultados};
+
+\draw[arrow] (c1) -- (c2);
+\draw[arrow] (c2) -- (c3);
+\draw[arrow] (c3) -- (c4);
+\draw[arrow] (c4) -- (c5);
+\draw[arrow] (c5) -- (c6);
+
+\end{tikzpicture}
+\caption{Flujo interno de procesamiento de commits}
+\label{fig:flujo_commits}
+\end{figure}
+
+La figura~\ref{fig:flujo_commits} muestra el flujo interno de procesamiento que se ha aplicado a los \emph{commits} una vez extraídos del repositorio. En este proceso, los datos son estructurados, clasificados semánticamente y analizados mediante distintas métricas, incluyendo la detección de \emph{tangled commits}. Finalmente, los resultados son consolidados para su posterior exportación en distintos formatos.
 
 
- 
-Recuerda que toda figura que añadas a tu memoria debe ser explicada.
-Sí, aunque te parezca evidente lo que se ve en la figura~\ref{fig:arquitectura}, la figura en sí solamente es un apoyo a tu texto.
-Así que explica lo que se ve en la figura, haciendo referencia a la misma tal y como ves aquí.
-Por ejemplo: En la figura~\ref{fig:arquitectura} se puede ver que la estructura del \emph{parser} básico, que consta de seis componentes diferentes: los datos se obtienen de la red, y según el tipo de dato, se pasará a un \emph{parser} específico y bla, bla, bla\ldots
+Además, la naturaleza secuencial del flujo facilita la validación individual de cada etapa, permitiendo identificar posibles errores o inconsistencias en fases concretas del procesamiento.
 
-Si utilizas una base de datos, no te olvides de incluir también un diagrama de entidad-relación.
+\section{Módulo de extracción de datos}
+\label{sec:extraccion}
 
+El módulo de extracción de datos es el encargado de obtener la información del repositorio a partir de la URL proporcionada por el usuario. Este módulo constituye la primera fase del sistema y es fundamental para garantizar la correcta obtención del historial de \emph{commits} que será procesado en etapas posteriores.
+
+Para llevar a cabo esta tarea, la herramienta utiliza el módulo \texttt{git\_reader}, que se encarga de verificar la disponibilidad de Git en el sistema y de gestionar la clonación o actualización del repositorio en local. Este enfoque permite trabajar sobre una copia del repositorio, evitando dependencias externas durante el proceso de análisis y permitiendo un análisis más rápido.
+
+Una vez disponible el repositorio, el módulo procede a la extracción del historial de \emph{commits}. Para cada \emph{commit}, se recopila información relevante como el identificador del cambio, el autor, el correo electrónico, la fecha, el mensaje asociado y métricas básicas como el número de ficheros modificados, las líneas insertadas y las eliminadas.
+
+Durante este proceso, se aplican mecanismos de validación y limpieza de datos con el objetivo de garantizar la calidad de la información obtenida. En particular, se gestionan posibles inconsistencias en los datos, como fechas mal formateadas, vacías o con valores corruptos, descartando aquellos \emph{commits} cuyos metadatos, como la fecha, no puedan ser interpretados de forma válida.
+
+El resultado de esta fase es una colección de \emph{commits} representados mediante estructuras internas homogéneas, que serán utilizadas por el módulo de análisis en las etapas posteriores del sistema.
+
+Este diseño permite desacoplar la obtención de datos del resto del sistema, facilitando su reutilización y permitiendo adaptar el proceso de extracción a distintos tipos de repositorios o fuentes de información en el futuro.
+
+Además, la herramienta permite reutilizar repositorios previamente descargados, optimizando el tiempo de ejecución mediante la actualización incremental de los datos cuando el repositorio ya existe en local.
+
+\section{Módulo de análisis}
+\label{sec:analisis}
+
+El módulo de análisis constituye el núcleo de la herramienta \emph{RepoAnalyzer}, siendo el encargado de procesar la información de los \emph{commits} y generar las métricas necesarias para caracterizar la evolución del repositorio.
+
+A partir de la colección de \emph{commits} previamente obtenida y normalizada, este módulo aplica diferentes técnicas de procesamiento con el objetivo de extraer conocimiento relevante sobre la actividad del proyecto.
+
+En primer lugar, se realiza la clasificación semántica de los \emph{commits}, basada en el análisis de los mensajes asociados a cada cambio. Este proceso permite asignar a cada \emph{commit} una categoría representativa de su propósito, como \emph{corrective}, \emph{management}, \emph{forward}, \emph{reengineering} o \emph{merge}. La clasificación se implementa mediante un enfoque basado en palabras clave, que permite identificar patrones comunes en los mensajes de los desarrolladores.
+
+A continuación, se calculan métricas cuantitativas relacionadas con los \emph{commits}, incluyendo el número total de cambios, el número de autores únicos, y estadísticas descriptivas sobre el tamaño de los cambios, tales como el número de ficheros modificados, las inserciones y las eliminaciones. Estas métricas permiten analizar la actividad del repositorio desde un punto de vista estructural.
+
+Adicionalmente, se realiza un análisis temporal de la actividad, calculando los intervalos entre \emph{commits} para cada autor. Este análisis permite estudiar el ritmo de desarrollo y detectar patrones de contribución a lo largo del tiempo.
+
+Por otro lado, el módulo incluye la detección de \emph{tangled commits}, definidos como aquellos cambios que agrupan múltiples modificaciones en un único \emph{commit}. Para ello, se utiliza un umbral basado en el número de ficheros modificados, lo que permite identificar cambios potencialmente complejos o difíciles de mantener.
+
+Finalmente, se calculan métricas adicionales que permiten analizar la relación entre distintas variables del repositorio, como la correlación entre el tamaño de los cambios y el número de líneas modificadas. Estas métricas proporcionan una visión más completa del comportamiento del proyecto.
+
+El diseño de este módulo permite integrar distintos tipos de análisis sobre los \emph{commits}, combinando métricas cuantitativas, clasificación semántica y análisis temporal, lo que proporciona una caracterización global del repositorio software.
+
+\subsection{Clasificación semántica de commits}
+\label{subsec:clasificacion}
+
+La clasificación semántica de los \emph{commits} tiene como objetivo identificar la naturaleza de los cambios realizados en el repositorio a partir de los mensajes asociados a cada \emph{commit}. Este proceso permite categorizar la actividad de desarrollo y analizar la evolución del proyecto desde una perspectiva funcional.
+
+Para ello, se ha implementado un enfoque basado en palabras clave, mediante el cual se asigna a cada \emph{commit} una categoría en función de los términos presentes en su mensaje. Este tipo de aproximación, aunque sencilla, resulta efectiva para identificar patrones comunes en los cambios realizados por los desarrolladores.
+
+En el contexto de este trabajo, se han definido las siguientes categorías principales:
+
+\begin{itemize}
+
+\item \textbf{Corrective:} incluye aquellos \emph{commits} orientados a la corrección de errores o fallos en el sistema.
+
+\item \textbf{Forward:} agrupa los cambios relacionados con la incorporación de nuevas funcionalidades o mejoras en el sistema.
+
+\item \textbf{Management:} hace referencia a tareas de gestión del proyecto, como cambios en configuración, dependencias o documentación.
+
+\item \textbf{Reengineering:} engloba modificaciones relacionadas con la reestructuración del código, sin alterar su funcionalidad, como refactorizaciones.
+
+\item \textbf{Merge:} incluye los \emph{commits} generados por la integración de ramas dentro del repositorio.
+
+\end{itemize}
+
+La asignación de categorías se realiza siguiendo un orden de prioridad predefinido, lo que permite resolver casos ambiguos en los que un mismo mensaje podría pertenecer a varias categorías. En estos casos, se selecciona la categoría más representativa según dicho orden.
+
+Este enfoque permite simplificar el análisis al asignar una única categoría por \emph{commit}, facilitando la interpretación de los resultados y el estudio de la distribución de tipos de cambios en el repositorio.
+
+Este enfoque se inspira en trabajos previos de clasificación de \emph{commits}, donde se ha demostrado que los mensajes asociados a los cambios constituyen una fuente útil de información para identificar la naturaleza de las modificaciones realizadas~\cite{hindle2009classifying}. En este trabajo, dichas ideas se adaptan mediante un enfoque basado en palabras clave y categorías definidas específicamente para el análisis propuesto.
+
+\subsection{Métricas y análisis cuantitativo}
+\label{subsec:metricas}
+
+El análisis cuantitativo de los \emph{commits} permite caracterizar la actividad del repositorio mediante el cálculo de métricas estadísticas sobre los cambios realizados. Estas métricas proporcionan una visión estructurada del comportamiento del proyecto y de la actividad de los desarrolladores.
+
+En primer lugar, se calculan métricas globales del repositorio, como el número total de \emph{commits}, el número de \emph{commits} de tipo \emph{merge} y el número de autores únicos. Estas métricas permiten obtener una visión general del tamaño y la actividad del proyecto.
+
+También se analizan métricas relacionadas con el tamaño de los cambios, incluyendo el número de ficheros modificados, las líneas insertadas y las eliminadas. A partir de estos valores, se calculan estadísticas descriptivas como la media, la mediana, el percentil 95 y el valor máximo, lo que permite identificar tanto el comportamiento habitual como los casos extremos.
+
+Por otro lado, se estudia la distribución de la actividad entre los desarrolladores, identificando aquellos autores con mayor número de \emph{commits}. Este análisis permite observar si la actividad está distribuida de forma homogénea o concentrada en un subconjunto reducido de contribuidores.
+
+El módulo incorpora además un análisis temporal de los \emph{commits}, calculando los intervalos de tiempo entre cambios consecutivos realizados por cada autor. Este análisis permite caracterizar el ritmo de desarrollo del proyecto y detectar patrones de actividad a lo largo del tiempo.
+
+Además, el uso de métricas estadísticas permite reducir la complejidad del análisis de grandes volúmenes de datos, facilitando la identificación de patrones relevantes en el comportamiento del repositorio.
+
+Este conjunto de métricas se ha definido en relación con las preguntas de investigación planteadas en el trabajo (RQ4–RQ7), permitiendo analizar distintos aspectos de la evolución del repositorio, como el ritmo de desarrollo (RQ4), la complejidad de los cambios (RQ5) y la relación entre diferentes métricas (RQ6–RQ7).
+
+\subsection{Análisis de \emph{tangled commits}}
+\label{subsec:tangled}
+
+El análisis de \emph{tangled commits} tiene como objetivo identificar aquellos cambios que agrupan múltiples modificaciones en un único \emph{commit}. Este tipo de cambios puede dificultar la comprensión del código y su mantenimiento, al mezclar distintas funcionalidades o propósitos en una sola unidad, como se ha observado en estudios previos sobre la complejidad de los cambios en repositorios software~\cite{herzig2013impact}.
+
+Para su detección, se ha definido un criterio basado en el número de ficheros modificados por \emph{commit}. En particular, se considera que un \emph{commit} es potencialmente \emph{tangled} cuando el número de ficheros afectados supera un umbral predefinido. Este enfoque permite identificar cambios de mayor complejidad de forma sencilla y eficiente.
+
+A partir de esta definición, se calcula el número total de \emph{tangled commits} en el repositorio, así como su proporción respecto al total de cambios en el repositorio. Además, se analizan las características de estos \emph{commits}, comparando su tamaño con el de aquellos considerados como cambios simples.
+
+Como extensión de este análisis, se estudia la distribución de \emph{tangled commits} en función de su categoría semántica. Este enfoque permite observar si ciertos tipos de cambios, como la incorporación de nuevas funcionalidades o las re-factorizaciones, presentan una mayor tendencia a agrupar múltiples modificaciones en un único \emph{commit}.
+
+Adicionalmente, se analiza la distribución de \emph{tangled commits} por autor, lo que permite identificar posibles patrones de comportamiento en los desarrolladores, como la tendencia a realizar cambios más complejos o agrupados por autor.
+
+Este conjunto de análisis proporciona una visión detallada de la complejidad de los cambios realizados en el repositorio, permitiendo ampliar el estudio cuantitativo y semántico de los \emph{commits}.
+
+\subsection{Análisis del tamaño de \emph{commits} por categoría}
+\label{subsec:rq6}
+
+El análisis del tamaño de los \emph{commits} en función de su categoría semántica permite estudiar si existen diferencias significativas en la complejidad de los cambios según su propósito. Este enfoque combina la información cuantitativa y la clasificación semántica, proporcionando una visión más detallada del comportamiento del repositorio.
+
+Para ello, se agrupan los \emph{commits} en función de la categoría asignada durante el proceso de clasificación, considerando categorías como \emph{corrective}, \emph{forward}, \emph{management}, \emph{reengineering} y \emph{merge}. Sobre cada uno de estos grupos se analizan métricas relacionadas con el tamaño de los cambios, como el número de ficheros modificados.
+
+A partir de estos valores, se calculan estadísticas descriptivas para cada categoría, incluyendo el número de \emph{commits}, la media, la mediana, el percentil 95 y el valor máximo. Estas métricas permiten identificar patrones diferenciados entre tipos de cambios, como la posible mayor complejidad de ciertas categorías frente a otras.
+
+Este análisis permite observar, por ejemplo, si los cambios relacionados con nuevas funcionalidades tienden a ser más extensos que aquellos destinados a la corrección de errores, o si las tareas de mantenimiento presentan un comportamiento distinto en términos de tamaño.
+
+En conjunto, este enfoque aporta una dimensión adicional al análisis del repositorio, permitiendo relacionar la naturaleza de los cambios con su complejidad estructural.
+
+Este tipo de análisis permite identificar patrones de desarrollo asociados a distintas actividades, lo que resulta de interés en estudios de ingeniería de software.
+
+\subsection{Análisis de correlaciones entre métricas}
+\label{subsec:rq7}
+
+El análisis de correlaciones entre métricas permite estudiar la relación existente entre distintas variables del repositorio, proporcionando una visión más profunda del comportamiento de los cambios realizados.
+
+En este trabajo, se analizan las relaciones entre el número de ficheros modificados, las líneas insertadas y las líneas eliminadas en cada \emph{commit}. Estas variables permiten caracterizar el tamaño y el impacto de los cambios desde distintas perspectivas.
+
+Para ello, se calcula el coeficiente de correlación entre pares de variables, lo que permite determinar si existe una relación lineal entre ellas. En particular, se estudian las correlaciones entre el número de ficheros modificados y las inserciones, entre ficheros modificados y eliminaciones, y entre inserciones y eliminaciones.
+
+El análisis de estos valores permite identificar patrones en la forma en que los desarrolladores realizan cambios en el repositorio. Por ejemplo, una alta correlación entre inserciones y eliminaciones podría indicar procesos de re-factorización, mientras que una relación entre el número de ficheros y las inserciones puede reflejar cambios distribuidos en múltiples componentes del sistema.
+
+Este enfoque permite complementar el análisis cuantitativo tradicional, aportando información sobre la relación entre distintas dimensiones de los cambios realizados.
+
+\section{Módulo de exportación de resultados}
+\label{sec:exportacion}
+
+El módulo de exportación de resultados es el encargado de generar los informes finales a partir de las métricas calculadas en el módulo de análisis. Su objetivo principal es facilitar la interpretación y reutilización de los datos obtenidos, permitiendo su uso en distintos contextos, como análisis posteriores o presentación de resultados.
+
+La herramienta permite exportar la información en múltiples formatos, incluyendo archivos CSV, JSON y Excel. Cada uno de estos formatos responde a necesidades específicas: los archivos CSV facilitan el análisis tabular de los datos, los archivos JSON permiten su integración con otras herramientas o sistemas, y los informes en formato Excel agrupan la información en un único documento estructurado.
+
+En particular, se generan distintos tipos de ficheros que contienen tanto información detallada como métricas agregadas del repositorio. Entre ellos se incluyen listados completos de \emph{commits}, resúmenes globales, distribuciones de categorías semánticas, intervalos temporales entre cambios y datos relacionados con los \emph{tangled commits}.
+
+El módulo también permite la generación de un informe en formato Excel que integra los resultados más relevantes en distintas hojas, facilitando su análisis conjunto y su presentación en el contexto del trabajo.
+
+Para garantizar la trazabilidad de los resultados, los ficheros generados incorporan información como el nombre del repositorio analizado y una marca temporal, evitando la sobrescritura de resultados en ejecuciones sucesivas.
+
+Este módulo se implementa mediante funciones específicas encargadas de transformar las estructuras internas del sistema en formatos de salida estandarizados, permitiendo desacoplar el proceso de análisis de la generación de informes.
+
+La generación de estos informes se realiza de forma automática al finalizar el proceso de análisis, sin requerir intervención adicional por parte del usuario.
+
+Este enfoque permite que los resultados generados por la herramienta puedan ser utilizados tanto en análisis manuales como en procesos automatizados, ampliando las posibilidades de explotación de los datos obtenidos.
+
+\section{Interfaz de ejecución}
+\label{sec:interfaz}
+
+La herramienta \emph{RepoAnalyzer} se ejecuta mediante una interfaz de línea de comandos, permitiendo al usuario indicar la URL del repositorio a analizar como parámetro de entrada. Este enfoque proporciona una forma sencilla y flexible de interactuar con el sistema, sin necesidad de interfaces gráficas adicionales.
+
+El proceso de ejecución se inicia mediante la invocación del programa principal, que recibe como argumento la dirección del repositorio. A partir de este punto, la herramienta ejecuta de forma automática las distintas fases del análisis, incluyendo la extracción de datos, el procesamiento de los \emph{commits} y la generación de los informes finales.
+
+La automatización de este flujo permite que el usuario no tenga que intervenir en las distintas etapas del proceso, facilitando la reproducibilidad del análisis sobre diferentes repositorios.
+
+Además, el uso de una interfaz de línea de comandos permite integrar la herramienta en scripts o procesos automatizados, ampliando sus posibilidades de uso en entornos de análisis más complejos.
+
+Finalmente, la herramienta proporciona información en consola durante su ejecución, mostrando los resultados principales y la ubicación de los ficheros generados, lo que facilita el seguimiento del proceso por parte del usuario.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -417,10 +663,23 @@ Si utilizas una base de datos, no te olvides de incluir también un diagrama de 
 \chapter{Experimentos y validación}
 \label{chap:experimentos}
 
-Este capítulo se introdujo como requisito en 2019. 
-Describe los experimentos y casos de test que tuviste que implementar para validar tus resultados. 
-Incluye también los resultados de validación que permiten afirmar que tus resultados son correctos. 
+\section{Metodología experimental}
+\label{sec:metodologia}
 
+El objetivo de esta fase es evaluar el comportamiento de la herramienta \emph{RepoAnalyzer} mediante su aplicación sobre repositorios reales de software. Para ello, se ha definido una metodología basada en la ejecución del sistema sobre distintos proyectos, analizando los resultados obtenidos y verificando su coherencia.
+
+El proceso experimental consiste en la selección de uno o varios repositorios de código abierto, la ejecución de la herramienta sobre dichos repositorios y el análisis de las métricas generadas. Este enfoque permite validar tanto el correcto funcionamiento del sistema como la utilidad de las métricas calculadas.
+
+Durante la ejecución, se han considerado diferentes dimensiones de análisis, incluyendo métricas cuantitativas, clasificación semántica y análisis temporal de los \emph{commits}. Esto permite evaluar la herramienta desde una perspectiva global, verificando que los resultados obtenidos son consistentes con el comportamiento esperado en proyectos reales. 
+
+\section{Selección de repositorios}
+\label{sec:repositorios_exp}
+
+Para la validación de la herramienta, se han seleccionado repositorios de código abierto ampliamente utilizados, que presentan un volumen significativo de \emph{commits} y actividad de desarrollo.
+
+La elección de estos repositorios permite analizar el comportamiento de la herramienta en escenarios reales, caracterizados por la existencia de múltiples desarrolladores, una evolución prolongada en el tiempo y una diversidad de tipos de cambios.
+
+Entre los repositorios analizados se incluyen proyectos populares dentro de la comunidad de desarrollo software, lo que garantiza la relevancia de los resultados obtenidos y su aplicabilidad en contextos reales.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
