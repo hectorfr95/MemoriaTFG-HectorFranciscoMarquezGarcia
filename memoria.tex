@@ -341,12 +341,12 @@ La Figura~\ref{fig:gantt_tfg} muestra de forma visual la planificación temporal
 \chapter{Estado del arte}
 \label{chap:estado}
 
-En este capítulo se presentan las tecnologías y trabajos previos relacionados con el desarrollo de este trabajo. En primer lugar, se describen las tecnologías base utilizadas, como Git, GitHub, GitLab y Python. Posteriormente, se revisan estudios relacionados con la minería de repositorios software, la clasificación de \emph{commits}, los \emph{tangled commits} y las métricas de evolución del software.
+En este capítulo se presentan las tecnologías y trabajos previos relacionados con el desarrollo de este trabajo. En primer lugar, se describen las tecnologías base utilizadas, como Git, GitHub, GitLab, Python y Gambit. Posteriormente, se revisan estudios relacionados con la minería de repositorios software, la clasificación de \emph{commits}, los \emph{tangled commits} y las métricas de evolución del software.
 
 \section{Tecnologías utilizadas}
 \label{sec:tecnologias}
 
-El desarrollo de este trabajo se apoya en un conjunto de tecnologías ampliamente utilizadas en el ámbito del desarrollo software libre. En particular, se han empleado Git como sistema de control de versiones, plataformas de alojamiento de repositorios como GitHub y GitLab, y Python como lenguaje de programación para la implementación de la herramienta.
+El desarrollo de este trabajo se apoya en un conjunto de tecnologías ampliamente utilizadas en el ámbito del desarrollo software libre. En particular, se han empleado Git como sistema de control de versiones, plataformas de alojamiento de repositorios como GitHub y GitLab, Python como lenguaje de programación para la implementación de la herramienta y \emph{Gambit} como apoyo para la desambiguación de identidades de autores.
 
 \subsection{Git}
 \label{subsec:git}
@@ -372,6 +372,15 @@ Python\footnote{Sitio oficial de Python: \url{https://www.python.org/}} es un le
 En este trabajo, Python se ha utilizado para implementar la herramienta \emph{RepoAnalyzer}, debido a su facilidad de uso, su legibilidad y la disponibilidad de bibliotecas útiles para el tratamiento de datos y la generación de informes. Además, su integración con herramientas del sistema permite ejecutar comandos de Git, procesar los resultados obtenidos y transformar la información extraída en métricas estructuradas.
 
 El uso de Python ha facilitado el desarrollo modular de la herramienta, permitiendo separar las distintas fases del proceso, como la extracción de datos, el análisis de métricas, la clasificación semántica de \emph{commits} y la exportación de resultados.
+
+\subsection{Gambit}
+\label{subsec:gambit}
+
+\emph{Gambit}~\cite{gote2021gambit} es una herramienta orientada a la desambiguación de identidades de autores en sistemas de control de versiones. En los repositorios Git, un mismo desarrollador puede aparecer representado mediante distintos nombres de usuario, direcciones de correo electrónico o alias, lo que puede afectar al cálculo de métricas relacionadas con autores únicos y distribución de contribuciones.
+
+En este trabajo, \emph{Gambit} se ha integrado como una fase complementaria dentro de \emph{RepoAnalyzer}, con el objetivo de agrupar alias que probablemente correspondan a una misma identidad. A partir de la información de autor y correo electrónico extraída de los \emph{commits}, la herramienta genera identificadores consolidados que se utilizan posteriormente en el cálculo de métricas por desarrollador.
+
+La incorporación de esta fase permite reducir duplicidades en el análisis de autores y mejorar la interpretación de resultados como el número de autores únicos, el listado de principales contribuidores o los intervalos temporales por desarrollador. No obstante, al tratarse de un proceso automático, sus resultados pueden requerir revisión manual en casos ambiguos.
 
 \section{Mining Software Repositories}
 \label{sec:msr}
@@ -590,9 +599,11 @@ Finalmente, se calculan métricas adicionales que permiten analizar la relación
 
 El diseño de este módulo permite integrar distintos tipos de análisis sobre los \emph{commits}, combinando métricas cuantitativas, clasificación semántica y análisis temporal, lo que proporciona una caracterización global del repositorio software.
 
-La Figura~\ref{fig:modulo_analisis} representa el funcionamiento interno del módulo de análisis de \emph{RepoAnalyzer}. A partir de la colección de \emph{commits} normalizados, el sistema aplica distintos procesos de análisis, incluyendo la clasificación semántica, el cálculo de métricas cuantitativas, el análisis temporal, la detección de \emph{tangled commits}, el análisis por categoría y el cálculo de correlaciones. Finalmente, los resultados se consolidan en una estructura común para su posterior exportación.
+Se ha incorporado una fase de desambiguación de identidades de autor mediante la herramienta \emph{Gambit}~\cite{gote2021gambit}. Esta fase permite agrupar distintos alias que pueden pertenecer a un mismo desarrollador, por ejemplo cuando una persona aparece en el historial con diferentes nombres de usuario o direcciones de correo electrónico. De esta forma, las métricas relacionadas con autores únicos, principales contribuidores y análisis temporal por desarrollador se calculan sobre identidades desambiguadas, reduciendo el sesgo producido por alias duplicados.
 
-\begin{figure}[H]
+La Figura~\ref{fig:modulo_analisis} representa el funcionamiento interno del módulo de análisis de \emph{RepoAnalyzer}. A partir de la colección de \emph{commits} normalizados, el sistema aplica distintos procesos de análisis, incluyendo la desambiguación de autores, la clasificación semántica, el cálculo de métricas cuantitativas, el análisis temporal, la detección de \emph{tangled commits}, el análisis por categoría y el cálculo de correlaciones. Finalmente, los resultados se consolidan en una estructura común para su posterior exportación.
+
+\begin{figure}
 \centering
 \resizebox{0.95\textwidth}{!}{%
 \begin{tikzpicture}[
@@ -636,12 +647,12 @@ $\bullet$ merge / other
 };
 
 \node[detailbox] (metricas) at (0,-4.5) {
-\textbf{Métricas cuantitativas}\\[1mm]
+\textbf{Desambiguación y métricas}\\[1mm]
+$\bullet$ Gambit\\
+$\bullet$ autores desambiguados\\
 $\bullet$ commits totales\\
-$\bullet$ autores únicos\\
 $\bullet$ ficheros cambiados\\
-$\bullet$ inserciones\\
-$\bullet$ eliminaciones
+$\bullet$ inserciones / eliminaciones
 };
 
 \node[detailbox] (temporal) at (6.2,-4.5) {
@@ -763,8 +774,8 @@ Con el fin de resumir las principales métricas calculadas por el módulo de an�
 \hline
 
 Métricas globales del repositorio &
-Número total de \emph{commits}, número de \emph{merge commits} y autores únicos. &
-Obtener una visión general del tamaño, actividad y participación en el repositorio. \\
+Número total de \emph{commits}, número de \emph{merge commits}, autores únicos desambiguados y alias agrupados por \emph{Gambit}. &
+Obtener una visión general del tamaño, actividad y participación en el repositorio, reduciendo duplicidades en la identificación de autores. \\
 \hline
 
 Métricas de tamaño de cambios &
@@ -778,12 +789,12 @@ Resumir el comportamiento habitual de los cambios y observar casos extremos. \\
 \hline
 
 Distribución por autores &
-Número de \emph{commits} por desarrollador y principales contribuidores. &
-Estudiar la distribución de la actividad y detectar concentración de contribuciones. \\
+Número de \emph{commits} por autor desambiguado y principales contribuidores. &
+Estudiar la distribución de la actividad y detectar concentración de contribuciones evitando, en la medida de lo posible, contar varias veces a un mismo desarrollador. \\
 \hline
 
 Análisis temporal &
-Intervalos entre \emph{commits} consecutivos, tanto globales como por autor. &
+Intervalos entre \emph{commits} consecutivos, tanto globales como por autor desambiguado. &
 Caracterizar el ritmo de desarrollo del proyecto y los patrones temporales de contribución. \\
 \hline
 
@@ -796,6 +807,16 @@ Además, el uso de métricas estadísticas permite reducir la complejidad del an
 
 Este conjunto de métricas se ha definido en relación con las preguntas de investigación planteadas en el trabajo (RQ4–RQ7), permitiendo analizar distintos aspectos de la evolución del repositorio, como el ritmo de desarrollo (RQ4), la complejidad de los cambios (RQ5) y la relación entre diferentes métricas (RQ6–RQ7).
 
+\subsection{Desambiguación de autores}
+\label{subsec:desambiguacion_autores}
+
+El análisis de la actividad por desarrollador puede verse afectado por la presencia de múltiples alias asociados a una misma persona. En los repositorios Git, un mismo desarrollador puede aparecer con diferentes nombres, correos electrónicos o identificadores, lo que puede provocar una sobreestimación del número de autores únicos y alterar la distribución de contribuciones.
+
+Para reducir este problema, la herramienta incorpora una fase de desambiguación de autores basada en \emph{Gambit}~\cite{gote2021gambit}, una herramienta orientada a la desambiguación de identidades en sistemas de control de versiones. A partir de los nombres y correos electrónicos extraídos de los \emph{commits}, \emph{Gambit} genera agrupaciones de alias que probablemente corresponden a una misma identidad.
+
+En \emph{RepoAnalyzer}, el resultado de esta fase se utiliza para calcular las métricas de autores sobre identidades desambiguadas. De este modo, métricas como el número de autores únicos, el listado de principales contribuidores o los intervalos temporales por autor se basan en identidades consolidadas, en lugar de depender únicamente del nombre original registrado en cada \emph{commit}.
+
+Además, la herramienta exporta un fichero específico con las identidades de autor generadas, lo que permite revisar los alias agrupados y mantener trazabilidad sobre el proceso de desambiguación. Este enfoque mejora la calidad del análisis, aunque no elimina completamente la posibilidad de agrupamientos incorrectos en casos ambiguos.
 
 \subsection{Análisis de \emph{tangled commits}}
 \label{subsec:tangled}
@@ -1076,7 +1097,7 @@ La herramienta \emph{RepoAnalyzer} ha sido ejecutada sobre el repositorio \emph{
 
 La ejecución se realiza a partir de la URL del repositorio, tras lo cual el sistema procesa automáticamente el historial de \emph{commits}, calculando las métricas definidas y generando los correspondientes informes.
 
-En la Tabla~\ref{tab:resumen_repo} se muestra un resumen general del repositorio analizado, incluyendo métricas globales como el número total de \emph{commits}, el número de autores únicos y el volumen total de cambios. En este caso, se observa que el repositorio cuenta con más de diez mil \emph{commits} y un número elevado de contribuidores, lo que refleja una actividad de desarrollo significativa y distribuida.
+En la Tabla~\ref{tab:resumen_repo} se muestra un resumen general del repositorio analizado, incluyendo métricas globales como el número total de \emph{commits}, el número de autores únicos tras la desambiguación mediante \emph{Gambit} y el volumen total de cambios. En este caso, se observa que el repositorio cuenta con más de diez mil \emph{commits} y un número elevado de contribuidores, lo que refleja una actividad de desarrollo significativa y distribuida.
 
 \begin{table}[H]
 \centering
@@ -1089,22 +1110,28 @@ En la Tabla~\ref{tab:resumen_repo} se muestra un resumen general del repositorio
 URL & \url{https://github.com/psf/requests} \\
 \hline
 
-\emph{Commits} totales & 10730 \\
+\emph{Commits} totales & 10784 \\
 \hline
 
 \emph{Merge commits} & 3094 \\
 \hline
 
-Autores únicos & 1744 \\
+Autores únicos tras desambiguación & 1592 \\
 \hline
 
-Ficheros tocados (suma) & 18127 \\
+Alias de autor originales & 1968 \\
 \hline
 
-Inserciones (suma) & 1471368 \\
+Alias agrupados por \emph{Gambit} & 376 \\
 \hline
 
-Borrados (suma) & 283204 \\
+Ficheros tocados (suma) & 18208 \\
+\hline
+
+Inserciones (suma) & 1472545 \\
+\hline
+
+Borrados (suma) & 283500 \\
 \hline
 
 \end{tabular}
@@ -1122,22 +1149,22 @@ Asimismo, la Tabla~\ref{tab:clasificacion} muestra la distribución de los \emph
 \textbf{Categoría} & \textbf{\emph{Commits}} & \textbf{\%} \\
 \hline
 
-\emph{other} & 3959 & 36.90 \\
+\emph{other} & 3977 & 36,88 \\
 \hline
 
-\emph{merge} & 3135 & 29.22 \\
+\emph{merge} & 3135 & 29,07 \\
 \hline
 
-\emph{management} & 1473 & 13.73 \\
+\emph{management} & 1492 & 13,84 \\
 \hline
 
-\emph{corrective} & 1326 & 12.36 \\
+\emph{corrective} & 1337 & 12,40 \\
 \hline
 
-\emph{forward} & 694 & 6.47 \\
+\emph{forward} & 699 & 6,48 \\
 \hline
 
-\emph{reengineering} & 143 & 1.33 \\
+\emph{reengineering} & 144 & 1,34 \\
 \hline
 
 \end{tabular}
@@ -1145,7 +1172,7 @@ Asimismo, la Tabla~\ref{tab:clasificacion} muestra la distribución de los \emph
 \label{tab:clasificacion}
 \end{table}
 
-Por otro lado, el análisis de \emph{tangled commits} se presenta en la Tabla~\ref{tab:tangled}, donde se observa la proporción de cambios complejos en el repositorio. En este caso, el porcentaje de \emph{tangled commits} es relativamente bajo, lo que sugiere que la mayoría de los cambios se realizan de forma estructurada, afectando a un número reducido de ficheros por \emph{commit}. Esto puede interpretarse como una buena práctica de desarrollo, en la que los cambios se mantienen acotados y fácilmente comprensibles.
+Por otro lado, el análisis de \emph{tangled commits} se presenta en la Tabla~\ref{tab:tangled}, donde se observa la proporción de cambios complejos en el repositorio. En este caso, el porcentaje de \emph{tangled commits} es relativamente bajo, con un 2,80\%, lo que sugiere que la mayoría de los cambios se realizan de forma estructurada, afectando a un número reducido de ficheros por \emph{commit}. Esto puede interpretarse como una buena práctica de desarrollo, en la que los cambios se mantienen acotados y fácilmente comprensibles.
 
 \begin{table}[H]
 \centering
@@ -1158,10 +1185,10 @@ Por otro lado, el análisis de \emph{tangled commits} se presenta en la Tabla~\r
 Umbral (ficheros por \emph{commit}) & 5 \\
 \hline
 
-\emph{Commits tangled} & 299 (2.79\%) \\
+\emph{Commits tangled} & 302 (2,80\%) \\
 \hline
 
-\emph{Commits no-tangled} & 10431 (97.21\%) \\
+\emph{Commits no-tangled} & 10482 (97,20\%) \\
 \hline
 
 \end{tabular}
@@ -1169,23 +1196,23 @@ Umbral (ficheros por \emph{commit}) & 5 \\
 \label{tab:tangled}
 \end{table}
 
-Finalmente, la Tabla~\ref{tab:correlaciones} muestra las correlaciones entre distintas métricas de los \emph{commits}. Se observa una alta correlación entre el número de ficheros modificados y las inserciones, lo que indica que los cambios que afectan a más ficheros tienden también a incluir un mayor número de líneas de código añadidas. Por el contrario, la correlación con las eliminaciones es menor, lo que sugiere que los procesos de eliminación de código no siempre siguen el mismo patrón que las inserciones.
+Finalmente, la Tabla~\ref{tab:correlaciones} muestra las correlaciones entre distintas métricas de los \emph{commits}. Se observa una alta correlación entre el número de ficheros modificados y las inserciones, lo que indica que los cambios que afectan a más ficheros tienden también a incluir un mayor número de líneas de código añadidas. Por el contrario, la correlación con los borrados es menor, lo que sugiere que los procesos de eliminación de código no siempre siguen el mismo patrón que las inserciones.
 
 \begin{table}[H]
 \centering
 \small
 \begin{tabular}{|p{7cm}|r|}
 \hline
-\textbf{Relación} & \textbf{Pearson r} \\
+\textbf{Relación} & \textbf{Coeficiente de Pearson} \\
 \hline
 
-\emph{Files changed} vs \emph{insertions} & 0.9922 \\
+\emph{Ficheros modificados} frente a \emph{inserciones} & 0,9922 \\
 \hline
 
-\emph{Files changed} vs \emph{deletions} & 0.0882 \\
+\emph{Ficheros modificados} frente a \emph{borrados} & 0,0882 \\
 \hline
 
-\emph{Insertions} vs \emph{deletions} & 0.0184 \\
+\emph{Inserciones} frente a \emph{borrados} & 0,0184 \\
 \hline
 
 \end{tabular}
@@ -1198,22 +1225,22 @@ Finalmente, la Tabla~\ref{tab:correlaciones} muestra las correlaciones entre dis
 
 Con el fin de reforzar la evaluación de la herramienta, se ha ejecutado \emph{RepoAnalyzer} sobre tres repositorios de software libre del ecosistema Python: \emph{requests}, \emph{flask} y \emph{pandas}. Esta selección permite comparar proyectos con distinto tamaño, antigüedad y volumen de actividad, proporcionando una visión más completa del comportamiento de la herramienta.
 
-la Tabla~\ref{tab:comparativa_repos} resume algunas de las métricas principales obtenidas para cada repositorio. Se observa que \emph{pandas} presenta un volumen de actividad muy superior al de los otros dos proyectos, tanto en número de \emph{commits} como en autores únicos y ficheros modificados. Por otro lado, \emph{requests} y \emph{flask} presentan tamaños más próximos entre sí, aunque con diferencias en la proporción de \emph{tangled commits} y en la distribución semántica de sus cambios.
+La Tabla~\ref{tab:comparativa_repos} resume algunas de las métricas principales obtenidas para cada repositorio. Se observa que \emph{pandas} presenta un volumen de actividad muy superior al de los otros dos proyectos, tanto en número de \emph{commits} como en autores únicos tras la desambiguación mediante \emph{Gambit}. Por otro lado, \emph{requests} y \emph{flask} presentan tamaños más próximos entre sí, aunque con diferencias en la proporción de \emph{tangled commits} y en la distribución semántica de sus cambios..
 
 En esta tabla, el porcentaje de \emph{merge commits} se calcula a partir de la detección estructural de merges en Git, mientras que la categoría semántica \emph{merge} procede de la clasificación basada en mensajes de \emph{commit}. Por este motivo, ambos valores pueden presentar ligeras diferencias.
 
 \begin{table}[H]
 \centering
 \small
-\begin{tabular}{|p{2.6cm}|r|r|r|r|p{3cm}|}
+\begin{tabular}{|p{2.5cm}|r|r|r|r|p{3cm}|}
 \hline
-\textbf{Repositorio} & \textbf{Commits} & \textbf{Autores} & \textbf{\% Merge estructural} & \textbf{\% Tangled} & \textbf{Categoría dominante} \\
+\textbf{Repositorio} & \textbf{Commits} & \textbf{Autores desamb.} & \textbf{\% Merge estructural} & \textbf{\% Tangled} & \textbf{Categoría dominante} \\
 \hline
-\emph{requests} & 10730 & 1744 & 28.84\% & 2.79\% & \emph{other} \\
+\emph{requests} & 10784 & 1592 & 28,69\% & 2,80\% & \emph{other} \\
 \hline
-\emph{flask} & 12123 & 1751 & 29.41\% & 5.53\% & \emph{merge} \\
+\emph{flask} & 12123 & 1583 & 29,42\% & 5,53\% & \emph{merge} \\
 \hline
-\emph{pandas} & 235948 & 8081 & 18.12\% & 11.02\% & \emph{other} \\
+\emph{pandas} & 235977 & 6226 & 18,12\% & 11,02\% & \emph{other} \\
 \hline
 \end{tabular}
 \caption{Comparativa general entre los repositorios analizados}
@@ -1241,7 +1268,7 @@ La Figura~\ref{fig:tangled_comparativa} muestra la proporción de \emph{tangled 
     grid=major
 ]
 \addplot coordinates {
-    (requests,2.79)
+    (requests,2.80)
     (flask,5.53)
     (pandas,11.02)
 };
@@ -1251,7 +1278,7 @@ La Figura~\ref{fig:tangled_comparativa} muestra la proporción de \emph{tangled 
 \label{fig:tangled_comparativa}
 \end{figure}
 
-Los resultados muestran que \emph{pandas} presenta la mayor proporción de \emph{tangled commits}, con un 11.02\%, frente al 5.53\% de \emph{flask} y el 2.79\% de \emph{requests}. Esto sugiere que en proyectos de mayor tamaño y complejidad pueden aparecer con más frecuencia cambios amplios o mezclados, lo que refuerza la utilidad de analizar este tipo de métricas.
+Los resultados muestran que \emph{pandas} presenta la mayor proporción de \emph{tangled commits}, con un 11,02\%, frente al 5,53\% de \emph{flask} y el 2,80\% de \emph{requests}. Esto sugiere que en proyectos de mayor tamaño y complejidad pueden aparecer con más frecuencia cambios amplios o mezclados, lo que refuerza la utilidad de analizar este tipo de métricas.
 
 La Figura~\ref{fig:categorias_comparativa} compara la distribución de categorías semánticas entre los tres repositorios analizados. Esta comparación permite observar diferencias en la naturaleza de los cambios realizados en cada proyecto.
 
@@ -1274,12 +1301,12 @@ La Figura~\ref{fig:categorias_comparativa} compara la distribución de categorí
     grid=major
 ]
 \addplot coordinates {
-    (other,36.90)
-    (merge,29.22)
-    (management,13.73)
-    (corrective,12.36)
-    (forward,6.47)
-    (reengineering,1.33)
+    (other,36.88)
+    (merge,29.07)
+    (management,13.84)
+    (corrective,12.40)
+    (forward,6.48)
+    (reengineering,1.34)
 };
 
 \addplot coordinates {
@@ -1296,7 +1323,7 @@ La Figura~\ref{fig:categorias_comparativa} compara la distribución de categorí
     (merge,18.44)
     (management,17.84)
     (corrective,21.93)
-    (forward,6.03)
+    (forward,6.02)
     (reengineering,2.79)
 };
 
@@ -1307,9 +1334,9 @@ La Figura~\ref{fig:categorias_comparativa} compara la distribución de categorí
 \label{fig:categorias_comparativa}
 \end{figure}
 
-La comparación muestra que las categorías \emph{other}, \emph{merge}, \emph{management} y \emph{corrective} concentran la mayor parte de los \emph{commits} en los tres repositorios. En \emph{requests} y \emph{flask} destaca una elevada presencia de \emph{merge commits}, lo que refleja procesos frecuentes de integración de cambios. En \emph{pandas}, por su parte, aumenta el peso relativo de la categoría \emph{corrective}, lo que puede asociarse a la complejidad y madurez de un proyecto de mayor tamaño, donde la corrección de errores y el mantenimiento adquieren una mayor relevancia.
+La comparación muestra que las categorías \emph{other}, \emph{merge}, \emph{management} y \emph{corrective} concentran la mayor parte de los \emph{commits} en los tres repositorios. En \emph{requests} y \emph{flask} destaca una elevada presencia de \emph{merge commits}, lo que refleja procesos frecuentes de integración de cambios. En \emph{pandas}, por su parte, aumenta el peso relativo de la categoría \emph{corrective}, con un 21,93\%, lo que puede asociarse a la complejidad y madurez de un proyecto de mayor tamaño, donde la corrección de errores y el mantenimiento adquieren una mayor relevancia.
 
-la Tabla~\ref{tab:aprendizajes_resultados} resume los principales aprendizajes extraídos a partir de la comparación realizada.
+La Tabla~\ref{tab:aprendizajes_resultados} resume los principales aprendizajes extraídos a partir de la comparación realizada.
 
 \begin{table}[H]
 \centering
@@ -1319,8 +1346,12 @@ la Tabla~\ref{tab:aprendizajes_resultados} resume los principales aprendizajes e
 \textbf{Resultado observado} & \textbf{Interpretación} \\
 \hline
 
-\emph{pandas} presenta un volumen muy superior de \emph{commits} y autores. &
+\emph{pandas} presenta un volumen muy superior de \emph{commits} y autores desambiguados. &
 La herramienta es capaz de aplicarse tanto a repositorios medianos como a proyectos de gran escala, manteniendo una estructura de análisis común. \\
+\hline
+
+La desambiguación mediante \emph{Gambit} agrupa múltiples alias de autor. &
+El uso directo de nombres y correos de Git puede sobrestimar el número real de desarrolladores, por lo que la desambiguación mejora la interpretación de métricas relacionadas con autores. \\
 \hline
 
 La actividad no se distribuye de forma homogénea entre desarrolladores. &
@@ -1336,7 +1367,7 @@ Los repositorios más complejos pueden presentar una mayor proporción de cambio
 \hline
 
 La correlación entre ficheros modificados e inserciones es alta en los tres proyectos. &
-Los cambios que afectan a más ficheros tienden también a incorporar más líneas de código, aunque esta relación no se mantiene con la misma intensidad para las eliminaciones. \\
+Los cambios que afectan a más ficheros tienden también a incorporar más líneas de código, aunque esta relación no se mantiene con la misma intensidad para los borrados. \\
 \hline
 
 \end{tabular}
@@ -1379,7 +1410,7 @@ Además de la validación manual de los resultados, se han incorporado pruebas a
 
 En particular, algunas pruebas contrastan los resultados generados por \emph{RepoAnalyzer} con comandos propios de Git, verificando métricas como el número total de \emph{commits} o el número de \emph{merge commits}. De esta forma, se refuerza la confianza en que las métricas calculadas por la herramienta son coherentes con la información real contenida en el repositorio.
 
-Durante esta comparación se observó que algunas métricas pueden presentar diferencias dependiendo del criterio utilizado para su cálculo. En particular, el recuento de autores puede variar en función de si se consideran únicamente los nombres de autor, los correos electrónicos o la combinación de ambos. En la versión actual de \emph{RepoAnalyzer}, no se aplica un proceso avanzado de desambiguación de identidades, por lo que un mismo desarrollador podría aparecer representado mediante distintos nombres de usuario o direcciones de correo electrónico. Esta limitación afecta especialmente a métricas como el número de autores únicos, la distribución de contribuciones y el análisis temporal por desarrollador.
+Durante esta comparación se observó que algunas métricas pueden presentar diferencias dependiendo del criterio utilizado para su cálculo. En particular, el recuento de autores puede variar en función de si se consideran únicamente los nombres de autor, los correos electrónicos, la combinación de ambos o identidades desambiguadas. En la versión actual de \emph{RepoAnalyzer}, el análisis de autores se realiza sobre identidades desambiguadas mediante \emph{Gambit}, por lo que el número final de autores únicos puede ser inferior al número de alias originales detectados en el historial. Esta diferencia no representa un error, sino una consecuencia del proceso de agrupación de alias aplicado para reducir duplicidades.
 
 Del mismo modo, se diferencia entre los \emph{merge commits} detectados estructuralmente por Git, a partir de la existencia de más de un padre en el historial, y los \emph{commits} clasificados semánticamente como \emph{merge} a partir del mensaje asociado. Esta distinción explica posibles diferencias entre las métricas estructurales y las categorías semánticas obtenidas durante el análisis.
 
@@ -1404,7 +1435,7 @@ Asimismo, se observa que la actividad no se distribuye de forma homogénea entre
 
 En términos generales, los repositorios analizados presentan una evolución activa, con una actividad sostenida en el tiempo y una estructura de contribución coherente con proyectos maduros dentro del ecosistema de desarrollo software.
 
-No obstante, los resultados deben interpretarse teniendo en cuenta algunas limitaciones. En primer lugar, la herramienta no incorpora actualmente un proceso avanzado de desambiguación de identidades, por lo que un mismo desarrollador podría aparecer representado mediante distintos nombres de usuario o direcciones de correo electrónico. En segundo lugar, tampoco se realiza una detección específica de bots, por lo que ciertas contribuciones automatizadas podrían influir en las métricas relacionadas con la actividad de los desarrolladores. Estas limitaciones no impiden el análisis realizado, pero sí señalan posibles mejoras para futuras versiones de la herramienta.
+No obstante, los resultados deben interpretarse teniendo en cuenta algunas limitaciones. En primer lugar, aunque la herramienta incorpora desambiguación de autores mediante \emph{Gambit}, este proceso se basa en heurísticas y similitud entre identidades, por lo que podrían existir casos ambiguos que requieran revisión manual. En segundo lugar, no se realiza una detección específica de bots, por lo que ciertas contribuciones automatizadas podrían influir en las métricas relacionadas con la actividad de los desarrolladores. Estas limitaciones no impiden el análisis realizado, pero sí señalan posibles mejoras para futuras versiones de la herramienta.
 
 \subsection{Patrones de desarrollo observados}
 \label{subsec:patrones}
@@ -1483,7 +1514,7 @@ El desarrollo de este trabajo ha permitido adquirir y reforzar diversas habilida
 Entre las principales lecciones aprendidas destacan:
 
 \begin{enumerate}
-    \item Aunque tenia conocimientos sobre la extracción de datos desde plataformas de desarrollo software no siempre es igual, siendo necesario aprender y entender que cada aplicación muestra los datos de una forma posible. Y a tener en cuenta posibles inconsistencias en la información obtenida y tener que filtrar dicha información previa a su análisis.
+    \item Aunque tenía conocimientos sobre la extracción de datos desde plataformas de desarrollo software no siempre es igual, siendo necesario aprender y entender que cada aplicación muestra los datos de una forma posible. Y a tener en cuenta posibles inconsistencias en la información obtenida y tener que filtrar dicha información previa a su análisis.
     
     \item La importancia del modelado de datos, ya que definir una estructura adecuada permite simplificar significativamente los procesos posteriores de análisis.
     
@@ -1531,9 +1562,13 @@ En primer lugar, se podría mejorar el sistema de clasificación semántica medi
 
 También sería interesante ampliar el análisis a otros aspectos del repositorio, como el estudio de ramas, \emph{pull requests} o incidencias, lo que permitiría obtener una visión más completa del proceso de desarrollo.
 
-Otra línea de mejora relevante consistiría en incorporar mecanismos de desambiguación de identidades de desarrolladores. En la versión actual de \emph{RepoAnalyzer}, los autores se identifican a partir de la información disponible en los \emph{commits}, como el nombre y el correo electrónico. Sin embargo, una misma persona puede aparecer con distintos identificadores, nombres de usuario o direcciones de correo, lo que puede afectar al cálculo de autores únicos, la distribución de contribuciones y el análisis temporal por desarrollador. Para abordar esta limitación, se podría estudiar la integración de herramientas especializadas como \emph{Gambit}~\cite{gote2021gambit}, orientada a la desambiguación de autores en sistemas de control de versiones.
+Otra línea de mejora relevante consistiría en ampliar los mecanismos de desambiguación de identidades de desarrolladores. En la versión actual de \emph{RepoAnalyzer} se ha incorporado una fase de desambiguación mediante \emph{Gambit}~\cite{gote2021gambit}, que permite agrupar alias de autor asociados a una misma identidad. No obstante, esta tarea sigue siendo compleja, ya que una misma persona puede aparecer con distintos nombres de usuario, direcciones de correo o formas de identificación. Como trabajo futuro, se podría profundizar en la evaluación de estos agrupamientos, incorporar validación manual en casos ambiguos o comparar los resultados con otros enfoques de desambiguación.
 
-Asimismo, sería conveniente incorporar un proceso específico de detección de bots. En repositorios de software libre es habitual encontrar cuentas automatizadas encargadas de tareas como actualización de dependencias, integración continua o mantenimiento automático. Si estas cuentas no se identifican correctamente, pueden introducir sesgos en las métricas relacionadas con la actividad de los desarrolladores. La integración de herramientas como \emph{BoDeGiC}~\cite{golzadeh2021bodegic}, orientada a la detección de bots en repositorios Git, permitiría diferenciar entre actividad humana y automatizada, mejorando la precisión del análisis.
+Asimismo, sería conveniente incorporar un proceso específico de detección de bots. En repositorios de software libre es habitual encontrar cuentas automatizadas encargadas de tareas como actualización de dependencias, integración continua o mantenimiento automático. Si estas cuentas no se identifican correctamente, pueden introducir sesgos en las métricas relacionadas con la actividad de los desarrolladores.
+
+Durante el desarrollo del trabajo se estudió la posible integración de \emph{BoDeGiC}~\cite{golzadeh2021bodegic}, herramienta orientada a la detección de bots en repositorios Git. No obstante, su integración directa en el flujo principal de \emph{RepoAnalyzer} no se incorporó finalmente debido a una incompatibilidad de dependencias observada durante las pruebas. En particular, la versión evaluada de \emph{BoDeGiC} depende de funcionalidades de versiones antiguas de \emph{pandas}, mientras que la integración de \emph{Gambit} para la desambiguación de autores requiere versiones más recientes de \emph{pandas} y \emph{numpy}.
+
+Como trabajo futuro, se plantea incorporar la detección de bots mediante un entorno aislado, por ejemplo utilizando contenedores o una fase externa independiente, o bien actualizando la herramienta para hacerla compatible con versiones actuales de sus dependencias. De este modo, sería posible complementar las métricas de autores con una distinción entre actividad humana y actividad automatizada.
 
 Otra posible mejora consiste en optimizar el rendimiento de la herramienta para su aplicación en repositorios de gran escala, así como desarrollar una interfaz gráfica que facilite su uso por parte de usuarios no técnicos.
 
