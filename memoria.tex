@@ -1372,7 +1372,18 @@ Se han contrastado métricas básicas con herramientas propias del sistema de co
 Finalmente, se han implementado pruebas automatizadas mediante \emph{pytest}, que permiten verificar tanto la correcta extracción de datos como el funcionamiento de las funciones internas del sistema. Estas pruebas incluyen la comparación de métricas con Git, así como la validación de componentes clave como el parseo de fechas y la clasificación semántica de los \emph{commits}.
 
 En conjunto, estos mecanismos permiten afirmar que las métricas generadas por la herramienta reflejan de forma fiable la información contenida en el repositorio analizado.
+\subsection{Pruebas automatizadas}
+\label{subsec:pruebas_automatizadas}
 
+Además de la validación manual de los resultados, se han incorporado pruebas automatizadas mediante \emph{pytest}. Estas pruebas permiten comprobar el correcto funcionamiento de componentes clave de la herramienta, como la extracción de información desde Git, el cálculo de métricas globales, la clasificación semántica de \emph{commits} y el tratamiento de fechas.
+
+En particular, algunas pruebas contrastan los resultados generados por \emph{RepoAnalyzer} con comandos propios de Git, verificando métricas como el número total de \emph{commits} o el número de \emph{merge commits}. De esta forma, se refuerza la confianza en que las métricas calculadas por la herramienta son coherentes con la información real contenida en el repositorio.
+
+Durante esta comparación se observó que algunas métricas pueden presentar diferencias dependiendo del criterio utilizado para su cálculo. En particular, el recuento de autores puede variar en función de si se consideran únicamente los nombres de autor, los correos electrónicos o la combinación de ambos. En la versión actual de \emph{RepoAnalyzer}, no se aplica un proceso avanzado de desambiguación de identidades, por lo que un mismo desarrollador podría aparecer representado mediante distintos nombres de usuario o direcciones de correo electrónico. Esta limitación afecta especialmente a métricas como el número de autores únicos, la distribución de contribuciones y el análisis temporal por desarrollador.
+
+Del mismo modo, se diferencia entre los \emph{merge commits} detectados estructuralmente por Git, a partir de la existencia de más de un padre en el historial, y los \emph{commits} clasificados semánticamente como \emph{merge} a partir del mensaje asociado. Esta distinción explica posibles diferencias entre las métricas estructurales y las categorías semánticas obtenidas durante el análisis.
+
+Estas pruebas complementan el análisis experimental realizado sobre repositorios reales y contribuyen a mejorar la fiabilidad del sistema desarrollado.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
