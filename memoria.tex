@@ -998,6 +998,50 @@ Donde:
 
 Estos resultados permiten analizar el comportamiento del desarrollo del proyecto, identificar patrones de contribución y evaluar la calidad de los cambios realizados. Asimismo, los ficheros generados pueden ser utilizados para análisis posteriores o visualización mediante herramientas externas.
 
+\section{Análisis de calidad del código}
+\label{sec:calidad_codigo}
+
+Con el objetivo de evaluar la calidad del código desarrollado, se ha utilizado la herramienta \emph{Pylint}, un analizador estático para Python que permite detectar errores, comprobar convenciones de estilo, identificar posibles problemas de mantenimiento y señalar oportunidades de mejora sin necesidad de ejecutar el programa.
+
+El análisis se ha realizado sobre los módulos principales de \emph{RepoAnalyzer} y sobre el conjunto de pruebas automatizadas mediante el siguiente comando:
+
+\begin{verbatim}
+python -m pylint repoanalyzer.py repoanalyzer tests
+\end{verbatim}
+
+Como resultado, \emph{Pylint} asignó al proyecto una puntuación global de \texttt{8.66/10}. Los avisos detectados se corresponden principalmente con aspectos de estilo, ausencia de documentación en algunos módulos o funciones, complejidad de determinadas funciones y pequeñas mejoras de robustez, como el tratamiento de excepciones o la limpieza de importaciones no utilizadas.
+
+No se han identificado errores funcionales críticos en los módulos principales de la herramienta. Por tanto, el resultado obtenido permite considerar que el código presenta una calidad adecuada para el alcance del trabajo, aunque existen aspectos mejorables relacionados con la documentación interna, la modularización de algunas funciones y el cumplimiento estricto de convenciones de estilo.
+
+Este análisis complementa las pruebas automatizadas realizadas con \emph{pytest}, ya que permite evaluar el código desde una perspectiva estática, reforzando la fiabilidad y sostenibilidad de la herramienta desarrollada.
+
+La Tabla~\ref{tab:pylint} resume los principales aspectos señalados por la herramienta.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|p{5cm}|p{7.5cm}|}
+\hline
+\textbf{Aspecto analizado} & \textbf{Resultado observado} \\
+\hline
+Puntuación global & \texttt{8.66/10} \\
+\hline
+Estilo de código & Avisos por líneas largas, espacios finales y orden de importaciones. \\
+\hline
+Documentación interna & Ausencia de docstrings en algunos módulos, clases y funciones. \\
+\hline
+Complejidad & Algunas funciones presentan un número elevado de variables, ramas o sentencias. \\
+\hline
+Robustez & Se detectan posibles mejoras en el tratamiento de excepciones y llamadas a \texttt{subprocess}. \\
+\hline
+Limpieza del código & Se detectan algunas importaciones no utilizadas. \\
+\hline
+\end{tabular}
+\caption{Resumen del análisis de calidad del código realizado con \emph{Pylint}}
+\label{tab:pylint}
+\end{table}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % EXPERIMENTOS, VALIDACIÓN y RESULTADOS %
@@ -1349,6 +1393,8 @@ Asimismo, se observa que la actividad no se distribuye de forma homogénea entre
 
 En términos generales, los repositorios analizados presentan una evolución activa, con una actividad sostenida en el tiempo y una estructura de contribución coherente con proyectos maduros dentro del ecosistema de desarrollo software.
 
+No obstante, los resultados deben interpretarse teniendo en cuenta algunas limitaciones. En primer lugar, la herramienta no incorpora actualmente un proceso avanzado de desambiguación de identidades, por lo que un mismo desarrollador podría aparecer representado mediante distintos nombres de usuario o direcciones de correo electrónico. En segundo lugar, tampoco se realiza una detección específica de bots, por lo que ciertas contribuciones automatizadas podrían influir en las métricas relacionadas con la actividad de los desarrolladores. Estas limitaciones no impiden el análisis realizado, pero sí señalan posibles mejoras para futuras versiones de la herramienta.
+
 \subsection{Patrones de desarrollo observados}
 \label{subsec:patrones}
 
@@ -1470,15 +1516,19 @@ Asimismo, las referencias bibliográficas, conceptos técnicos y afirmaciones in
 
 A pesar de los resultados obtenidos, existen diversas líneas de mejora y ampliación que podrían abordarse en futuros trabajos.
 
-En primer lugar, se podría mejorar el sistema de clasificación semántica mediante el uso de técnicas de aprendizaje automático o procesamiento del lenguaje natural más avanzadas, que permitan una categorización más precisa de los \emph{commits}.
+En primer lugar, se podría mejorar el sistema de clasificación semántica mediante el uso de técnicas de aprendizaje automático o procesamiento del lenguaje natural más avanzadas, que permitan una categorización más precisa de los \emph{commits}. Esto permitiría reducir la dependencia de reglas basadas en palabras clave y mejorar la identificación de la intención real de los cambios.
 
 También sería interesante ampliar el análisis a otros aspectos del repositorio, como el estudio de ramas, \emph{pull requests} o incidencias, lo que permitiría obtener una visión más completa del proceso de desarrollo.
 
+Otra línea de mejora relevante consistiría en incorporar mecanismos de desambiguación de identidades de desarrolladores. En la versión actual de \emph{RepoAnalyzer}, los autores se identifican a partir de la información disponible en los \emph{commits}, como el nombre y el correo electrónico. Sin embargo, una misma persona puede aparecer con distintos identificadores, nombres de usuario o direcciones de correo, lo que puede afectar al cálculo de autores únicos, la distribución de contribuciones y el análisis temporal por desarrollador. Para abordar esta limitación, se podría estudiar la integración de herramientas especializadas como \emph{Gambit}~\cite{gote2021gambit}, orientada a la desambiguación de autores en sistemas de control de versiones.
+
+Asimismo, sería conveniente incorporar un proceso específico de detección de bots. En repositorios de software libre es habitual encontrar cuentas automatizadas encargadas de tareas como actualización de dependencias, integración continua o mantenimiento automático. Si estas cuentas no se identifican correctamente, pueden introducir sesgos en las métricas relacionadas con la actividad de los desarrolladores. La integración de herramientas como \emph{BoDeGiC}~\cite{golzadeh2021bodegic}, orientada a la detección de bots en repositorios Git, permitiría diferenciar entre actividad humana y automatizada, mejorando la precisión del análisis.
+
 Otra posible mejora consiste en optimizar el rendimiento de la herramienta para su aplicación en repositorios de gran escala, así como desarrollar una interfaz gráfica que facilite su uso por parte de usuarios no técnicos.
 
-Se podría aplicar la herramienta a un conjunto más amplio de repositorios con el objetivo de realizar estudios comparativos y extraer conclusiones más generales sobre el desarrollo de software colaborativo.
+También se podría aplicar la herramienta a un conjunto más amplio de repositorios con el objetivo de realizar estudios comparativos y extraer conclusiones más generales sobre el desarrollo de software colaborativo.
 
-Finalmente, se podría realizar una herramienta o script automatizado para ejecutar la herramienta \emph{RepoAnalyzer} periódicamente sobre un repositorio para llevar un análisis periódico sobre el repositorio.
+Finalmente, se podría desarrollar un sistema de ejecución periódica de \emph{RepoAnalyzer} sobre un repositorio determinado, permitiendo realizar un seguimiento temporal de su evolución y generar informes recurrentes sobre la actividad del proyecto.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
