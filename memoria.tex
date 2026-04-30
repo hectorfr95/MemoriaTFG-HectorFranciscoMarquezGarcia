@@ -155,7 +155,7 @@ Gracias a mi madre, que con su esfuerzo y paciencia me ayudó a estar hoy escrib
 
 En este trabajo fin de grado se presenta el diseño y desarrollo de una herramienta denominada \emph{RepoAnalyzer}, orientada al análisis de repositorios de software basados en Git. El objetivo principal del proyecto es caracterizar los \emph{commits} y estudiar la evolución del desarrollo colaborativo en proyectos de software libre.
 
-El desarrollo de la herramienta se ha realizado utilizando Python, implementando mecanismos para la extracción automática del historial de \emph{commits}, el procesamiento de los datos y el cálculo de métricas cuantitativas, como el número de ficheros modificados, inserciones y eliminaciones. Asimismo, se ha incorporado un sistema de clasificación semántica basado en palabras clave, junto con funcionalidades de análisis temporal, estudio de contribuciones por desarrollador y detección de \emph{tangled commits}.
+El desarrollo de la herramienta se ha realizado utilizando Python, implementando mecanismos para la extracción automática del historial de \emph{commits}, el procesamiento de los datos y el cálculo de métricas cuantitativas, como el número de ficheros modificados, inserciones y eliminaciones. Asimismo, se ha incorporado un sistema de clasificación semántica basado en palabras clave, junto con funcionalidades de análisis temporal, desambiguación de autores mediante \emph{Gambit}, estudio de contribuciones por desarrollador y detección de \emph{tangled commits}.
 
 Este trabajo se enmarca dentro del ámbito de la ingeniería del software, concretamente en el área de minería de repositorios software, donde los historiales de cambios constituyen una fuente relevante de información para el análisis del desarrollo. La herramienta ha sido validada mediante su aplicación sobre repositorios reales, contrastando los resultados obtenidos con herramientas externas como Git y mediante la implementación de pruebas automatizadas.
 
@@ -170,7 +170,7 @@ Los resultados obtenidos permiten identificar patrones relevantes en el desarrol
 
 This bachelor's thesis presents the design and development of a tool named \emph{RepoAnalyzer}, aimed at analyzing Git-based software repositories. The main objective is to characterize commits and study the evolution of collaborative development in open-source projects.
 
-The tool has been developed using Python and includes mechanisms for automatic extraction of commit history, data processing, and computation of quantitative metrics such as modified files, insertions, and deletions. Additionally, a keyword-based semantic classification system has been implemented, along with temporal analysis, contributor activity analysis, and detection of \emph{tangled commits}.
+The tool has been developed using Python and includes mechanisms for automatic extraction of commit history, data processing, and computation of quantitative metrics such as modified files, insertions, and deletions. Additionally, a keyword-based semantic classification system has been implemented, along with temporal analysis, author identity disambiguation using \emph{Gambit}, contributor activity analysis, and detection of \emph{tangled commits}.
 
 This work is framed within the field of software engineering, specifically in the area of software repository mining, where version control histories provide valuable information for understanding development processes. The tool has been validated using real repositories, comparing results with external tools such as Git and through the implementation of automated tests.
 
@@ -810,7 +810,7 @@ Este conjunto de métricas se ha definido en relación con las preguntas de inve
 \subsection{Desambiguación de autores}
 \label{subsec:desambiguacion_autores}
 
-El análisis de la actividad por desarrollador puede verse afectado por la presencia de múltiples alias asociados a una misma persona. En los repositorios Git, un mismo desarrollador puede aparecer con diferentes nombres, correos electrónicos o identificadores, lo que puede provocar una sobreestimación del número de autores únicos y alterar la distribución de contribuciones.
+El análisis de la actividad por desarrollador puede verse afectado por la presencia de múltiples alias asociados a una misma persona. En los repositorios Git, un mismo desarrollador puede aparecer con diferentes nombres, correos electrónicos o identificadores, lo que puede provocar una sobrestimación del número de autores únicos y alterar la distribución de contribuciones.
 
 Para reducir este problema, la herramienta incorpora una fase de desambiguación de autores basada en \emph{Gambit}~\cite{gote2021gambit}, una herramienta orientada a la desambiguación de identidades en sistemas de control de versiones. A partir de los nombres y correos electrónicos extraídos de los \emph{commits}, \emph{Gambit} genera agrupaciones de alias que probablemente corresponden a una misma identidad.
 
@@ -977,7 +977,7 @@ La Figura~\ref{fig:ejecucion_repoanalyzer} muestra un ejemplo de ejecución de \
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{img/ejecucion_repoanalyzer.png}
+    \includegraphics[width=0.9\textwidth]{img/ejecucion_repoanalyzer_gambit.png}
     \caption{Ejemplo de ejecución de \emph{RepoAnalyzer} desde línea de comandos}
     \label{fig:ejecucion_repoanalyzer}
 \end{figure}
@@ -1030,7 +1030,7 @@ El análisis se ha realizado sobre los módulos principales de \emph{RepoAnalyze
 python -m pylint repoanalyzer.py repoanalyzer tests
 \end{verbatim}
 
-Como resultado, \emph{Pylint} asignó al proyecto una puntuación global de \texttt{8.66/10}. Los avisos detectados se corresponden principalmente con aspectos de estilo, ausencia de documentación en algunos módulos o funciones, complejidad de determinadas funciones y pequeñas mejoras de robustez, como el tratamiento de excepciones o la limpieza de importaciones no utilizadas.
+Como resultado, \emph{Pylint} asignó al proyecto una puntuación global de \texttt{8.69/10}. Los avisos detectados se corresponden principalmente con aspectos de estilo, ausencia de documentación en algunos módulos o funciones, complejidad de determinadas funciones y pequeñas mejoras de robustez, como el tratamiento de excepciones o el uso de \texttt{subprocess}.
 
 No se han identificado errores funcionales críticos en los módulos principales de la herramienta. Por tanto, el resultado obtenido permite considerar que el código presenta una calidad adecuada para el alcance del trabajo, aunque existen aspectos mejorables relacionados con la documentación interna, la modularización de algunas funciones y el cumplimiento estricto de convenciones de estilo.
 
@@ -1045,17 +1045,19 @@ La Tabla~\ref{tab:pylint} resume los principales aspectos señalados por la herr
 \hline
 \textbf{Aspecto analizado} & \textbf{Resultado observado} \\
 \hline
-Puntuación global & \texttt{8.66/10} \\
+Puntuación global & \texttt{8.69/10} \\
 \hline
-Estilo de código & Avisos por líneas largas, espacios finales y orden de importaciones. \\
+Estilo de código & Avisos por líneas largas, espacios finales, saltos de línea finales y orden de importaciones. \\
 \hline
 Documentación interna & Ausencia de docstrings en algunos módulos, clases y funciones. \\
 \hline
 Complejidad & Algunas funciones presentan un número elevado de variables, ramas o sentencias. \\
 \hline
-Robustez & Se detectan posibles mejoras en el tratamiento de excepciones y llamadas a \texttt{subprocess}. \\
+Robustez & Se detectan posibles mejoras en el tratamiento de excepciones y en el uso de \texttt{subprocess}. \\
 \hline
-Limpieza del código & Se detectan algunas importaciones no utilizadas. \\
+Limpieza del código & Se detectan algunas importaciones no utilizadas y reimportaciones en módulos auxiliares. \\
+\hline
+Dependencias y pruebas & Algunos avisos afectan al módulo de pruebas, especialmente por la resolución de importaciones y redefinición de nombres en fixtures o variables auxiliares. \\
 \hline
 \end{tabular}
 \caption{Resumen del análisis de calidad del código realizado con \emph{Pylint}}
