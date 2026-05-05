@@ -302,6 +302,8 @@ Para alcanzar el objetivo general planteado, se han definido los siguientes obje
 
 \item Analizar la distribución de actividad entre los desarrolladores, identificando patrones de contribución dentro del repositorio.
 
+\item Incorporar un mecanismo de desambiguación de autores que permita agrupar alias asociados a una misma identidad, reduciendo duplicidades en las métricas relacionadas con desarrolladores.
+
 \item Estudiar los intervalos temporales entre \emph{commits}, con el objetivo de caracterizar el ritmo de desarrollo del proyecto.
 
 \item Detectar \emph{tangled commits}, es decir, cambios que agrupan múltiples modificaciones en un único \emph{commit}, y analizar su impacto.
@@ -478,12 +480,18 @@ En la figura~\ref{fig:arquitectura} se muestra una representación general de la
 \node[box, below=of input] (git) {Módulo de extracción\\(\texttt{git\_reader})};
 \node[box, below=of git] (model) {Módulo de modelado de commits\\(\texttt{CommitRecord})};
 \node[box, below=of model] (analysis) {Módulo de análisis\\(\texttt{analysis})};
-\node[box, below left=of analysis] (classifier) {Clasificación semántica\\(\texttt{classifier})};
-\node[box, below right=of analysis] (metrics) {Cálculo de métricas\\RQ4-RQ7};
-\node[box, below=2cm of analysis] (export) {Módulo de exportación\\(\texttt{exporter} / \texttt{report})};
-\node[box, below left=of export] (csv) {CSV};
-\node[box, below=of export] (json) {JSON};
-\node[box, below right=of export] (xlsx) {Excel};
+\node[box, below left=1.4cm and 1.8cm of analysis] (classifier)
+{Clasificación semántica\\(\texttt{classifier})};
+
+\node[box, below right=1.4cm and 1.8cm of analysis] (metrics)
+{Desambiguación y métricas\\Gambit y RQ4--RQ7};
+
+\node[box, below=3.1cm of analysis] (export)
+{Módulo de exportación\\(\texttt{exporter} / \texttt{report})};
+
+\node[box, below left=1.2cm and 1.6cm of export] (csv) {CSV};
+\node[box, below=1.2cm of export] (json) {JSON};
+\node[box, below right=1.2cm and 1.6cm of export] (xlsx) {Excel};
 
 \draw[arrow] (input) -- (git);
 \draw[arrow] (git) -- (model);
@@ -541,7 +549,7 @@ Este flujo de procesamiento permite automatizar completamente el análisis de re
 ]
 
 \node[box] (c1) {Commits extraídos};
-\node[box, below=of c1] (c2) {Estructuración (CommitRecord)};
+\node[box, below=of c1] (c2) {Desambiguación de autores};
 \node[box, below=of c2] (c3) {Clasificación semántica};
 \node[box, below=of c3] (c4) {Cálculo de métricas};
 \node[box, below=of c4] (c5) {Detección de tangled commits};
@@ -558,7 +566,7 @@ Este flujo de procesamiento permite automatizar completamente el análisis de re
 \label{fig:flujo_commits}
 \end{figure}
 
-La figura~\ref{fig:flujo_commits} muestra el flujo interno de procesamiento que se ha aplicado a los \emph{commits} una vez extraídos del repositorio. En este proceso, los datos son estructurados, clasificados semánticamente y analizados mediante distintas métricas, incluyendo la detección de \emph{tangled commits}. Finalmente, los resultados son consolidados para su posterior exportación en distintos formatos.
+La figura~\ref{fig:flujo_commits} muestra el flujo interno de procesamiento que se ha aplicado a los \emph{commits} una vez extraídos del repositorio. En este proceso, los datos son estructurados, se desambiguan las identidades de autor, se clasifican semánticamente y se analizan mediante distintas métricas, incluyendo la detección de \emph{tangled commits}. Finalmente, los resultados son consolidados para su posterior exportación en distintos formatos.
 
 
 Además, la naturaleza secuencial del flujo facilita la validación individual de cada etapa, permitiendo identificar posibles errores o inconsistencias en fases concretas del procesamiento.
@@ -658,7 +666,7 @@ $\bullet$ inserciones / eliminaciones
 \node[detailbox] (temporal) at (6.2,-4.5) {
 \textbf{Análisis temporal (RQ4)}\\[1mm]
 $\bullet$ intervalos globales\\
-$\bullet$ intervalos por autor
+$\bullet$ intervalos por autor desambiguado
 };
 
 % Segunda fila
@@ -667,7 +675,7 @@ $\bullet$ intervalos por autor
 $\bullet$ umbral: \\ficheros cambiados $\geq$ 5\\
 $\bullet$ resumen global\\
 $\bullet$ por categoría\\
-$\bullet$ por autor
+$\bullet$ por autor desambiguado
 };
 
 \node[detailbox] (categoria) at (0,-8.9) {
@@ -755,7 +763,7 @@ Este enfoque se inspira en trabajos previos de clasificación de \emph{commits},
 
 El análisis cuantitativo de los \emph{commits} permite caracterizar la actividad del repositorio mediante el cálculo de métricas estadísticas sobre los cambios realizados. Estas métricas proporcionan una visión estructurada del comportamiento del proyecto y de la actividad de los desarrolladores.
 
-En primer lugar, se calculan métricas globales del repositorio, como el número total de \emph{commits}, el número de \emph{commits} de tipo \emph{merge} y el número de autores únicos. Estas métricas permiten obtener una visión general del tamaño y la actividad del proyecto.
+En primer lugar, se calculan métricas globales del repositorio, como el número total de \emph{commits}, el número de \emph{commits} de tipo \emph{merge}, el número de autores únicos tras desambiguación y el número de alias agrupados mediante \emph{Gambit}. Estas métricas permiten obtener una visión general del tamaño y la actividad del proyecto.
 
 También se analizan métricas relacionadas con el tamaño de los cambios, incluyendo el número de ficheros modificados, las líneas insertadas y las eliminadas. A partir de estos valores, se calculan estadísticas descriptivas como la media, la mediana, el percentil 95 y el valor máximo, lo que permite identificar tanto el comportamiento habitual como los casos extremos.
 
@@ -823,7 +831,7 @@ Además, la herramienta exporta un fichero específico con las identidades de au
 
 El análisis de \emph{tangled commits} tiene como objetivo identificar aquellos cambios que agrupan múltiples modificaciones en un único \emph{commit}. Este tipo de cambios puede dificultar la comprensión del código y su mantenimiento, al mezclar distintas funcionalidades o propósitos en una sola unidad, como se ha observado en estudios previos sobre la complejidad de los cambios en repositorios software~\cite{herzig2013impact}.
 
-Para su detección, se ha definido un criterio basado en el número de ficheros modificados por \emph{commit}. En particular, se considera que un \emph{commit} es potencialmente \emph{tangled} cuando el número de ficheros afectados supera un umbral predefinido. Este enfoque permite identificar cambios de mayor complejidad de forma sencilla y eficiente.
+Para su detección, se ha definido un criterio basado en el número de ficheros modificados por \emph{commit}. En particular, se considera que un \emph{commit} es potencialmente \emph{tangled} cuando el número de ficheros afectados alcanza o supera un umbral predefinido. Este enfoque permite identificar cambios de mayor complejidad de forma sencilla y eficiente.
 
 A partir de esta definición, se calcula el número total de \emph{tangled commits} en el repositorio, así como su proporción respecto al total de cambios en el repositorio. Además, se analizan las características de estos \emph{commits}, comparando su tamaño con el de aquellos considerados como cambios simples.
 
@@ -1227,7 +1235,7 @@ Finalmente, la Tabla~\ref{tab:correlaciones} muestra las correlaciones entre dis
 
 Con el fin de reforzar la evaluación de la herramienta, se ha ejecutado \emph{RepoAnalyzer} sobre tres repositorios de software libre del ecosistema Python: \emph{requests}, \emph{flask} y \emph{pandas}. Esta selección permite comparar proyectos con distinto tamaño, antigüedad y volumen de actividad, proporcionando una visión más completa del comportamiento de la herramienta.
 
-La Tabla~\ref{tab:comparativa_repos} resume algunas de las métricas principales obtenidas para cada repositorio. Se observa que \emph{pandas} presenta un volumen de actividad muy superior al de los otros dos proyectos, tanto en número de \emph{commits} como en autores únicos tras la desambiguación mediante \emph{Gambit}. Por otro lado, \emph{requests} y \emph{flask} presentan tamaños más próximos entre sí, aunque con diferencias en la proporción de \emph{tangled commits} y en la distribución semántica de sus cambios..
+La Tabla~\ref{tab:comparativa_repos} resume algunas de las métricas principales obtenidas para cada repositorio. Se observa que \emph{pandas} presenta un volumen de actividad muy superior al de los otros dos proyectos, tanto en número de \emph{commits} como en autores únicos tras la desambiguación mediante \emph{Gambit}. Por otro lado, \emph{requests} y \emph{flask} presentan tamaños más próximos entre sí, aunque con diferencias en la proporción de \emph{tangled commits} y en la distribución semántica de sus cambios.
 
 En esta tabla, el porcentaje de \emph{merge commits} se calcula a partir de la detección estructural de merges en Git, mientras que la categoría semántica \emph{merge} procede de la clasificación basada en mensajes de \emph{commit}. Por este motivo, ambos valores pueden presentar ligeras diferencias.
 
@@ -1400,7 +1408,7 @@ Adicionalmente, el análisis de correlaciones (RQ7) muestra una fuerte relación
 
 Además de la interpretación de los resultados, se ha llevado a cabo una verificación de las métricas generadas con el objetivo de asegurar su correcta implementación. En primer lugar, se ha comprobado la consistencia interna de los datos, verificando que las agregaciones realizadas son coherentes, como la correspondencia entre el número total de \emph{commits} y la suma de categorías o la correcta proporción de \emph{tangled commits} respecto al total.
 
-Se han contrastado métricas básicas con herramientas propias del sistema de control de versiones Git. En particular, se han validado valores como el número total de \emph{commits}, el número de autores y el número de \emph{merge commits}, obteniendo resultados consistentes. Durante este proceso, se ha tenido en cuenta que Git puede identificar autores en función de la combinación nombre-correo electrónico, mientras que en este trabajo se ha optado por considerar autores únicos a partir del nombre normalizado, lo que puede generar ligeras diferencias en el conteo si no se aplica el mismo criterio.
+Se han contrastado métricas básicas con herramientas propias del sistema de control de versiones Git. En particular, se han validado valores como el número total de \emph{commits}, el número de autores y el número de \emph{merge commits}, obteniendo resultados consistentes. Durante este proceso, se ha tenido en cuenta que Git puede identificar autores en función de distintos criterios, como el nombre, el correo electrónico o la combinación de ambos. En este trabajo, las métricas de autores se calculan tras aplicar un proceso de desambiguación mediante \emph{Gambit}, por lo que el número de autores únicos puede diferir del recuento directo obtenido mediante comandos de Git. Esta diferencia no representa un error, sino una consecuencia del criterio de agrupación de alias utilizado.
 
 Finalmente, se han implementado pruebas automatizadas mediante \emph{pytest}, que permiten verificar tanto la correcta extracción de datos como el funcionamiento de las funciones internas del sistema. Estas pruebas incluyen la comparación de métricas con Git, así como la validación de componentes clave como el parseo de fechas y la clasificación semántica de los \emph{commits}.
 
@@ -1483,7 +1491,7 @@ El objetivo principal de este trabajo ha sido el diseño e implementación de un
 
 Este objetivo se ha alcanzado satisfactoriamente mediante el desarrollo de la herramienta \emph{RepoAnalyzer}, que permite la extracción automática de información de repositorios, el cálculo de métricas cuantitativas, la clasificación semántica de los \emph{commits} y la generación de informes estructurados.
 
-En cuanto a los objetivos específicos, se ha conseguido implementar un modelo de datos adecuado para representar los \emph{commits}, así como un sistema de análisis que permite estudiar diferentes dimensiones del desarrollo, incluyendo métricas de tamaño, distribución de actividad entre desarrolladores, análisis temporal y detección de \emph{tangled commits}.
+En cuanto a los objetivos específicos, se ha conseguido implementar un modelo de datos adecuado para representar los \emph{commits}, así como un sistema de análisis que permite estudiar diferentes dimensiones del desarrollo, incluyendo métricas de tamaño, desambiguación de autores, distribución de actividad entre desarrolladores, análisis temporal y detección de \emph{tangled commits}.
 
 Se ha logrado validar el funcionamiento de la herramienta mediante su aplicación sobre repositorios reales, verificando la coherencia de los resultados obtenidos y contrastando métricas con herramientas externas como Git. La incorporación de pruebas automatizadas ha permitido reforzar la fiabilidad del sistema.
 
