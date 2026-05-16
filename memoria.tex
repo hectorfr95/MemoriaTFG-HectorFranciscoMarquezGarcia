@@ -393,12 +393,14 @@ Los repositorios de control de versiones, sistemas de seguimiento de errores y p
 
 Hassan~\cite{hassan2008road} destaca que estos repositorios constituyen una fuente valiosa de información detallada, permitiendo analizar patrones de desarrollo y mejorar los procesos de ingeniería del software. Este enfoque ha dado lugar a numerosos estudios que utilizan métricas derivadas de los historiales de cambios para comprender mejor cómo se construyen y mantienen los desarrollos software.
 
+En esta misma línea, Kagdi et al.~\cite{kagdi2007survey} presentan una revisión y clasificación de enfoques de minería de repositorios software en el contexto de la evolución del software. En dicho trabajo se destaca que los repositorios pueden analizarse desde distintas fuentes de información, como historiales de control de versiones, incidencias o documentación, y mediante diferentes técnicas orientadas a comprender los cambios, la actividad de los desarrolladores y la evolución del código. Esta perspectiva resulta relevante para este trabajo, ya que \emph{RepoAnalyzer} se centra en el historial de \emph{commits} como fuente principal de información, combinando métricas cuantitativas, clasificación semántica y análisis temporal.
+
 \section{Clasificación semántica de commits}
 \label{sec:clasificacion}
 
 Uno de los aspectos más relevantes en el análisis de repositorios software es la clasificación de los \emph{commits} según su propósito. Los mensajes de \emph{commit} permiten inferir la intención del cambio realizado a partir de la información proporcionada por el desarrollador, como la corrección de errores, la implementación de nuevas funcionalidades o la realización de tareas de mantenimiento.
 
-Distintos trabajos han abordado la clasificación de cambios software desde diferentes perspectivas. Swanson~\cite{swanson1976dimensions} propuso una clasificación clásica de actividades de mantenimiento software, diferenciando entre mantenimiento correctivo, adaptativo y perfectivo. Posteriormente, Mockus y Votta~\cite{mockus2000identifying} analizaron historiales de cambios para identificar las razones por las que evoluciona el software, como la adición de nuevas funcionalidades, la corrección de defectos o la reestructuración del código. En una línea similar, Hindle et al.~\cite{hindle2009automatic} propusieron la clasificación automática de cambios en categorías de mantenimiento mediante técnicas de aprendizaje automático, utilizando información procedente de los metadatos y mensajes de los \emph{commits}.
+Distintos trabajos han abordado la clasificación de cambios software desde diferentes perspectivas. Swanson~\cite{swanson1976dimensions} propuso una clasificación clásica de actividades de mantenimiento software, diferenciando entre mantenimiento correctivo, adaptativo y perfectivo. Posteriormente, Mockus y Votta~\cite{mockus2000identifying} analizaron historiales de cambios para identificar las razones por las que evoluciona el software, como la adición de nuevas funcionalidades, la corrección de defectos o la reestructuración del código. En una línea similar, Hindle et al.~\cite{hindle2009automatic} propusieron la clasificación automática de cambios en categorías de mantenimiento mediante técnicas de aprendizaje automático, utilizando información procedente de los metadatos y mensajes de los \emph{commits}. Más recientemente, Levin y Yehudai~\cite{levin2017boosting} estudiaron la clasificación automática de \emph{commits} en actividades de mantenimiento, incorporando información textual y cambios en el código fuente para mejorar la identificación del tipo de actividad realizada. Asimismo, Heri{\v{c}}ko y {\v{S}}umak~\cite{hericko2023commit} presentan una revisión sistemática sobre modelos de clasificación de \emph{commits} en actividades de mantenimiento, destacando el uso frecuente de características extraídas de los mensajes de \emph{commit}, del código fuente y de los metadatos asociados.
 
 Estos trabajos muestran que la información contenida en los historiales de cambios puede utilizarse para estudiar la naturaleza de la actividad de desarrollo. En este trabajo, dicha idea se adapta mediante un enfoque basado en palabras clave, asignando cada \emph{commit} a una categoría semántica como \emph{corrective}, \emph{forward}, \emph{management}, \emph{reengineering} o \emph{merge}.
 
@@ -411,6 +413,8 @@ La clasificación semántica de los \emph{commits} resulta especialmente útil p
 Un problema identificado en el análisis de repositorios software es la existencia de \emph{tangled commits}, es decir, \emph{commits} que agrupan múltiples cambios lógicos en una única unidad.
 
 Herzig et al.~\cite{herzig2013impact} analizan el impacto de este tipo de cambios en modelos de predicción de defectos, mostrando que los \emph{commits} pueden contener modificaciones heterogéneas que dificultan su interpretación y análisis automático. Por ejemplo, un \emph{commit} puede estar asociado aparentemente a una nueva funcionalidad, pero incluir también correcciones o cambios en otras partes del sistema. Esta situación complica la categorización de los \emph{commits} y puede introducir ruido en los estudios empíricos.
+
+Trabajos posteriores, como el de Herbold et al.~\cite{herbold2022tangling}, han continuado estudiando este fenómeno en \emph{commits} de corrección de errores. Sus resultados refuerzan la importancia de identificar cambios mezclados, ya que los \emph{tangled commits} pueden introducir ruido en los datos utilizados para estudios empíricos sobre defectos y evolución del software.
 
 Por ello, la identificación y análisis de \emph{tangled commits} resulta relevante para mejorar la calidad de los estudios sobre evolución del software.
 
@@ -734,7 +738,7 @@ Salida para exportación\\CSV $\bullet$ JSON $\bullet$ Excel
 
 La clasificación semántica de los \emph{commits} tiene como objetivo identificar la naturaleza de los cambios realizados en el repositorio a partir de los mensajes asociados a cada \emph{commit}. Este proceso permite categorizar la actividad de desarrollo y analizar la evolución del proyecto desde una perspectiva funcional.
 
-Para ello, se ha implementado un enfoque basado en palabras clave, mediante el cual se asigna a cada \emph{commit} una categoría en función de los términos presentes en su mensaje. Este tipo de aproximación, aunque sencilla, resulta efectiva para identificar patrones comunes en los cambios realizados por los desarrolladores.
+Para ello, se ha implementado un enfoque basado en palabras clave y expresiones regulares, mediante el cual se asigna a cada \emph{commit} una categoría en función de los términos presentes en su mensaje. Este tipo de aproximación, aunque sencilla, resulta interpretable y reproducible, permitiendo identificar patrones comunes en los cambios realizados por los desarrolladores.
 
 En el contexto de este trabajo, se han definido las siguientes categorías principales:
 
@@ -751,6 +755,49 @@ En el contexto de este trabajo, se han definido las siguientes categorías princ
 \item \textbf{Merge:} incluye los \emph{commits} generados por la integración de ramas dentro del repositorio.
 
 \end{itemize}
+
+Para implementar esta clasificación se definió un conjunto de expresiones regulares asociadas a cada categoría. El mensaje de cada \emph{commit} se procesa comparándolo con dichas reglas, aplicando coincidencias no sensibles a mayúsculas y minúsculas. Además, se utilizan límites de palabra en muchas de las expresiones para reducir falsos positivos, evitando que una palabra clave coincida como parte de otra palabra más larga.
+
+La Tabla~\ref{tab:palabras_clave_clasificacion} resume las principales palabras clave y patrones utilizados para cada categoría semántica.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|p{3.2cm}|p{9.5cm}|}
+\hline
+\textbf{Categoría} & \textbf{Palabras clave y patrones utilizados} \\
+\hline
+
+\emph{merge} &
+\texttt{merge}, \texttt{merge pull request}, \texttt{pull request} \\
+\hline
+
+\emph{corrective} &
+\texttt{fix}, \texttt{fixed}, \texttt{fixes}, \texttt{bug}, \texttt{bugs}, \texttt{error}, \texttt{errors}, \texttt{issue}, \texttt{issues}, \texttt{hotfix}, \texttt{patch}, \texttt{revert}, \texttt{reverted} \\
+\hline
+
+\emph{management} &
+\texttt{doc}, \texttt{docs}, \texttt{documentation}, \texttt{readme}, \texttt{changelog}, \texttt{test}, \texttt{tests}, \texttt{testing}, \texttt{ci}, \texttt{build}, \texttt{dep}, \texttt{deps}, \texttt{dependency}, \texttt{dependencies}, \texttt{bump}, \texttt{release}, \texttt{version} \\
+\hline
+
+\emph{forward} &
+\texttt{feat}, \texttt{feature}, \texttt{add}, \texttt{added}, \texttt{implement}, \texttt{implemented}, \texttt{introduce}, \texttt{introduced}, \texttt{introducing}, \texttt{new}, \texttt{support} \\
+\hline
+
+\emph{reengineering} &
+\texttt{refactor}, \texttt{refactored}, \texttt{clean}, \texttt{cleanup}, \texttt{cleaning}, \texttt{optimize}, \texttt{optimized}, \texttt{optimizing}, \texttt{optimization}, \texttt{perf}, \texttt{performance}, \texttt{restructure}, \texttt{restructured}, \texttt{rename}, \texttt{renamed} \\
+\hline
+
+\emph{other} &
+Categoría asignada cuando el mensaje no coincide con ninguna de las reglas anteriores. \\
+\hline
+
+\end{tabular}
+\caption{Palabras clave y patrones utilizados para la clasificación semántica de \emph{commits}}
+\label{tab:palabras_clave_clasificacion}
+\end{table}
+
+En los casos en los que un mensaje contiene patrones asociados a varias categorías, se aplica un orden de prioridad para obtener una clasificación de etiqueta única. El orden utilizado es: \emph{merge}, \emph{corrective}, \emph{management}, \emph{forward}, \emph{reengineering} y, finalmente, \emph{other}. De este modo, los \emph{commits} de integración tienen prioridad sobre el resto de categorías, evitando que mensajes como \emph{merge pull request} que contengan términos asociados a correcciones o nuevas funcionalidades sean clasificados en otra categoría.
 
 La asignación de categorías se realiza siguiendo un orden de prioridad predefinido, lo que permite resolver casos ambiguos en los que un mismo mensaje podría pertenecer a varias categorías. En estos casos, se selecciona la categoría más representativa según dicho orden.
 
@@ -818,7 +865,7 @@ Este conjunto de métricas se ha definido en relación con las preguntas de inve
 \subsection{Desambiguación de autores}
 \label{subsec:desambiguacion_autores}
 
-El análisis de la actividad por desarrollador puede verse afectado por la presencia de múltiples alias asociados a una misma persona. En los repositorios Git, un mismo desarrollador puede aparecer con diferentes nombres, correos electrónicos o identificadores, lo que puede provocar una sobrestimación del número de autores únicos y alterar la distribución de contribuciones.
+El análisis de la actividad por desarrollador puede verse afectado por la presencia de múltiples alias asociados a una misma persona. En los repositorios Git, un mismo desarrollador puede aparecer con diferentes nombres, correos electrónicos o identificadores, lo que puede provocar una sobrestimación del número de autores únicos y alterar la distribución de contribuciones. Este problema ha sido identificado previamente en el ámbito de la minería de repositorios software, donde la correcta identificación de desarrolladores resulta necesaria para integrar datos procedentes de distintas fuentes y evitar duplicidades en el análisis~\cite{robles2005developer}.
 
 Para reducir este problema, la herramienta incorpora una fase de desambiguación de autores basada en \emph{Gambit}~\cite{gote2021gambit}, una herramienta orientada a la desambiguación de identidades en sistemas de control de versiones. A partir de los nombres y correos electrónicos extraídos de los \emph{commits}, \emph{Gambit} genera agrupaciones de alias que probablemente corresponden a una misma identidad.
 
